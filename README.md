@@ -26,6 +26,14 @@ Todo lo que empieza por `VITE_` queda escrito dentro del JavaScript que descarga
 
 Vite lee estas variables al compilar, no al abrir la página. Si cambias una en Vercel, hay que volver a desplegar para que se note.
 
+## Qué muestra esta versión
+
+El inicio pide `GET /api/v1/base-tecnica` a la URL de `VITE_API_URL` y muestra el dato que la API trae de Firestore. La pantalla tiene tres resultados: consultando, éxito (mensaje y fecha en hora de Bogotá) y error con el botón «Reintentar». Si la API responde que no hay dato, se muestra ese mensaje y el mismo botón.
+
+La primera consulta a Render puede tardar cerca de un minuto porque el servicio gratuito se duerme. A los 10 segundos la pantalla avisa que el servidor puede estar despertando. Si pasan 90 segundos sin respuesta, queda el error y se puede reintentar.
+
+También están las rutas del mapa: inicio, ingreso, registro, panel, perfil, sala, ayuda y la página de no encontrado. Ingreso, registro, panel, perfil y sala dicen con claridad que llegan en un sprint posterior.
+
 ## Ejecutar en local
 
 Requisitos: Node.js 24 y npm.
