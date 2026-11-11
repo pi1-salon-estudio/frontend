@@ -42,7 +42,15 @@ export async function ingresarConCorreo(correo: string, contrasena: string): Pro
   try {
     await signInWithEmailAndPassword(obtenerAuth(), correo, contrasena)
   } catch (error) {
-    throw new ErrorIngreso(mensajeDeIngreso(error), codigoDe(error))
+    const codigo = codigoDe(error)
+    if (
+      codigo === 'auth/network-request-failed' ||
+      codigo === 'auth/too-many-requests' ||
+      codigo === 'auth/operation-not-allowed'
+    ) {
+      throw new ErrorIngreso(mensajeDeIngreso(error), codigo)
+    }
+    throw new ErrorIngreso('Correo o contraseña incorrectos', codigo)
   }
 }
 
@@ -60,6 +68,9 @@ export function mensajeDeIngreso(error: unknown): string {
   }
   if (codigo === 'auth/network-request-failed') {
     return 'No pudimos conectar con el servicio de ingreso. Revisa tu conexión e inténtalo de nuevo.'
+  }
+  if (codigo === 'auth/operation-not-allowed') {
+    return 'El ingreso con correo no está habilitado. Hay que activarlo en Firebase.'
   }
   return 'No pudimos iniciar la sesión. Inténtalo de nuevo.'
 }
