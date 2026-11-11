@@ -62,7 +62,7 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
   }, [])
 
   function reintentar() {
-    void cargarRef.current(usuarioRef.current)
+    return cargarRef.current(usuarioRef.current)
   }
 
   return <ContextoSesionReact value={{ estado, reintentar }}>{children}</ContextoSesionReact>

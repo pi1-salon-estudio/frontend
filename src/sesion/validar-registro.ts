@@ -44,6 +44,15 @@ export function validarRegistro(datos: DatosRegistro): Record<string, string> {
   return campos
 }
 
+export function validarNombreUsuario(nombreUsuario: string): string | null {
+  const nombre = nombreUsuario.trim()
+  if (!nombre) return 'Elige un nombre de usuario.'
+  if (!NOMBRE_USUARIO.test(nombre)) {
+    return 'Usa de 3 a 20 caracteres: empieza con una letra y sigue con letras, números o guion bajo.'
+  }
+  return null
+}
+
 export function primerCampo(campos: Record<string, string>): (typeof ORDEN)[number] | null {
   return ORDEN.find((clave) => campos[clave]) ?? null
 }
