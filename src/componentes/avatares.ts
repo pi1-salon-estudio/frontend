@@ -1,8 +1,8 @@
 export const AVATARES = [
-  { id: 'pino', nombre: 'Pino', clase: 'bg-pino' },
-  { id: 'tinta', nombre: 'Tinta', clase: 'bg-tinta' },
-  { id: 'piedra', nombre: 'Piedra', clase: 'bg-piedra' },
-  { id: 'aviso', nombre: 'Aviso', clase: 'bg-aviso' },
-  { id: 'exito', nombre: 'Éxito', clase: 'bg-exito' },
-  { id: 'papel', nombre: 'Papel', clase: 'border border-linea bg-papel' },
+  { id: 'pino', nombre: 'Azul', clase: 'bg-pino' },
+  { id: 'exito', nombre: 'Cielo', clase: 'bg-cielo' },
+  { id: 'aviso', nombre: 'Marino', clase: 'bg-aviso' },
+  { id: 'tinta', nombre: 'Negro', clase: 'bg-tinta' },
+  { id: 'piedra', nombre: 'Grafito', clase: 'bg-piedra' },
+  { id: 'papel', nombre: 'Blanco', clase: 'border border-tinta bg-papel' },
 ] as const

@@ -46,7 +46,7 @@ export function Campo({
         aria-invalid={error ? true : undefined}
         aria-describedby={descrito}
         onChange={(evento) => onChange(evento.target.value)}
-        className={`mt-1 w-full rounded-md border bg-white px-3 py-2 ${error ? 'border-aviso' : 'border-linea'}`}
+        className={`mt-1 w-full rounded-md border bg-papel px-3 py-2 text-tinta ${error ? 'border-2 border-aviso' : 'border-linea'}`}
       />
       {error && (
         <p id={errorId} className="mt-1 text-sm text-aviso">

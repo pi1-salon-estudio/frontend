@@ -26,18 +26,18 @@ export function Marco({ children }: MarcoProps) {
       >
         Saltar al contenido
       </a>
-      <header className="border-b border-linea">
-        <div className="mx-auto flex max-w-3xl flex-col gap-3 px-4 py-4">
-          <p className="text-sm font-medium text-pino">Salón de estudio</p>
+      <header className="border-b border-linea bg-papel">
+        <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-5">
+          <p className="text-sm font-semibold tracking-wide text-tinta">Salón de estudio</p>
           <nav aria-label="Principal">
-            <ul className="flex flex-wrap gap-x-4 gap-y-2">
+            <ul className="flex flex-wrap gap-x-5 gap-y-2">
               {ENLACES.map((enlace) => (
                 <li key={enlace.to}>
                   <NavLink
                     to={enlace.to}
                     end={enlace.end}
                     className={({ isActive }) =>
-                      isActive ? 'font-semibold text-pino underline' : 'text-tinta hover:underline'
+                      isActive ? 'font-semibold text-pino' : 'text-tinta hover:text-pino'
                     }
                   >
                     {enlace.etiqueta}
@@ -48,7 +48,7 @@ export function Marco({ children }: MarcoProps) {
           </nav>
         </div>
       </header>
-      <main id="contenido" tabIndex={-1} className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
+      <main id="contenido" tabIndex={-1} className="mx-auto w-full max-w-3xl flex-1 px-4 py-10">
         {children}
       </main>
       <footer className="border-t border-linea">
