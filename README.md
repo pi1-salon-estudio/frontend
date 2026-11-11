@@ -35,7 +35,7 @@ El inicio pide `GET /api/v1/base-tecnica` a la URL de `VITE_API_URL` y muestra e
 
 La primera consulta a Render puede tardar cerca de un minuto porque el servicio gratuito se duerme. A los 10 segundos la pantalla avisa que el servidor puede estar despertando. Si pasan 90 segundos sin respuesta, queda el error y se puede reintentar.
 
-También están las rutas del mapa: inicio, ingreso, registro, panel, perfil, sala, ayuda y la página de no encontrado. Registro crea la cuenta con correo y, si la sesión abre, lleva al panel. El panel vacío dice que todavía no hay salas. Ingreso, perfil y sala siguen anunciando que llegan después. Para crear la cuenta hacen falta las variables de Firebase y los proveedores de correo activados en la consola.
+También están las rutas del mapa: inicio, ingreso, registro, panel, perfil, sala, ayuda y la página de no encontrado. Registro crea la cuenta con correo y, si la sesión abre, lleva al panel. Ingreso entra con Google y, si falta el nombre de usuario, abre `/registro/usuario`. Panel, perfil y sala devuelven a esa pantalla mientras el perfil esté incompleto. El ingreso con correo todavía no está. Para probarlo hacen falta las variables de Firebase y los proveedores de correo y de Google activos en la consola.
 
 ## Ejecutar en local
 
