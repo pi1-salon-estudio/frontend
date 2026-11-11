@@ -44,6 +44,10 @@ export async function registrarConCorreo(datos: RegistroCorreo): Promise<void> {
   await pedir('/api/v1/usuarios', { method: 'POST', cuerpo: datos })
 }
 
+export async function cerrarSesion(token: string): Promise<void> {
+  await pedir('/api/v1/sesion/cerrar', { method: 'POST', token })
+}
+
 export async function completarConGoogle(token: string, nombreUsuario: string): Promise<void> {
   await pedir('/api/v1/usuarios/google', {
     method: 'POST',

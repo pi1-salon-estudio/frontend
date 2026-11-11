@@ -1,4 +1,7 @@
-import { Link, useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { cerrarSesion } from '../api/usuarios.ts'
+import { cerrarAuth, tokenActual } from '../firebase/ingresar.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
 import { useTitulo } from '../use-titulo.ts'
 
@@ -6,7 +9,22 @@ export function Panel() {
   useTitulo('Panel')
   const { estado, reintentar } = useSesion()
   const location = useLocation()
+  const navigate = useNavigate()
+  const [cerrando, setCerrando] = useState(false)
   const cuentaCreada = location.state?.cuentaCreada === true
+
+  async function salir() {
+    if (cerrando) return
+    setCerrando(true)
+    try {
+      const token = await tokenActual()
+      await cerrarSesion(token)
+    } catch {
+      // La sesión local se cierra igual. El servidor puede tardar unos segundos en revocar el token.
+    }
+    await cerrarAuth()
+    navigate('/ingreso', { replace: true })
+  }
 
   return (
     <>
@@ -46,6 +64,14 @@ export function Panel() {
             </p>
             <p className="mt-3">Todavía no tienes salas.</p>
             <p className="mt-3 text-piedra">Crear una sala llega en el siguiente sprint.</p>
+            <button
+              type="button"
+              onClick={() => void salir()}
+              disabled={cerrando}
+              className="mt-6 rounded-md border border-linea bg-white px-4 py-2 font-medium text-tinta hover:underline disabled:opacity-70"
+            >
+              {cerrando ? 'Cerrando la sesión.' : 'Cerrar sesión'}
+            </button>
           </>
         )}
         {estado.tipo === 'lista' && !estado.perfil && (
