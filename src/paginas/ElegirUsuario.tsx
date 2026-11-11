@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { completarConGoogle, ErrorApi } from '../api/usuarios.ts'
 import { Campo } from '../componentes/Campo.tsx'
+import { btnPrimario, btnSecundario, textoSecundario, tituloPagina } from '../estilos.ts'
 import { cerrarAuth, tokenActual } from '../firebase/ingresar.ts'
 import { validarNombreUsuario } from '../sesion/validar-registro.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
@@ -73,7 +74,7 @@ export function ElegirUsuario() {
   if (estado.tipo === 'cargando') {
     return (
       <>
-        <h1 className="text-3xl font-semibold">Nombre de usuario</h1>
+        <h1 className={tituloPagina}>Nombre de usuario</h1>
         <p className="mt-3" aria-busy="true">
           Revisando tu sesión.
         </p>
@@ -84,7 +85,7 @@ export function ElegirUsuario() {
   if (estado.tipo === 'sin-sesion') {
     return (
       <>
-        <h1 className="text-3xl font-semibold">Nombre de usuario</h1>
+        <h1 className={tituloPagina}>Nombre de usuario</h1>
         <p className="mt-3 max-w-prose">Entra con Google para elegir tu nombre de usuario.</p>
         <p className="mt-4">
           <Link to="/ingreso" className="text-pino underline">
@@ -98,7 +99,7 @@ export function ElegirUsuario() {
   if (estado.tipo === 'error') {
     return (
       <>
-        <h1 className="text-3xl font-semibold">Nombre de usuario</h1>
+        <h1 className={tituloPagina}>Nombre de usuario</h1>
         <p id="mensaje-usuario" className="mt-3 text-aviso">
           {estado.mensaje}
         </p>
@@ -106,7 +107,7 @@ export function ElegirUsuario() {
           type="button"
           onClick={() => void reintentar()}
           aria-describedby="mensaje-usuario"
-          className="mt-4 rounded-md bg-pino px-4 py-2 font-medium text-white hover:bg-pino-hover"
+          className={`${btnPrimario} mt-4`}
         >
           Reintentar
         </button>
@@ -117,7 +118,7 @@ export function ElegirUsuario() {
   if (estado.perfilCompleto) {
     return (
       <>
-        <h1 className="text-3xl font-semibold">Nombre de usuario</h1>
+        <h1 className={tituloPagina}>Nombre de usuario</h1>
         <p className="mt-3">Tu cuenta ya tiene nombre de usuario.</p>
         <p className="mt-4">
           <Link to="/panel" className="text-pino underline">
@@ -132,16 +133,14 @@ export function ElegirUsuario() {
 
   return (
     <>
-      <h1 className="text-3xl font-semibold">Nombre de usuario</h1>
-      <p className="mt-3 max-w-prose">
-        Google ya nos dio tu nombre y tu correo. Elige cómo te verán en el salón. Este paso no se puede saltar.
-      </p>
+      <h1 className={tituloPagina}>Nombre de usuario</h1>
+      <p className={textoSecundario}>Elige cómo te verán en la sala.</p>
       {fase === 'exito' ? (
         <p className="mt-6 text-exito" role="status">
           {mensaje}
         </p>
       ) : (
-        <form className="mt-6 max-w-prose" aria-busy={fase === 'cargando'} noValidate onSubmit={enviar}>
+        <form className="mt-8 max-w-[520px]" aria-busy={fase === 'cargando'} noValidate onSubmit={enviar}>
           <div aria-live="polite">
             {mensaje && <p className={fase === 'error' ? 'text-aviso' : undefined}>{mensaje}</p>}
           </div>
@@ -162,7 +161,7 @@ export function ElegirUsuario() {
             <button
               type="submit"
               disabled={ocupado}
-              className="rounded-md bg-pino px-4 py-2 font-medium text-white hover:bg-pino-hover disabled:opacity-70"
+              className={btnPrimario}
             >
               {fase === 'cargando' ? 'Guardando el nombre.' : 'Continuar'}
             </button>
@@ -170,7 +169,7 @@ export function ElegirUsuario() {
               type="button"
               onClick={() => void cancelar()}
               disabled={ocupado}
-              className="rounded-md border border-linea bg-white px-4 py-2 font-medium text-tinta hover:underline disabled:opacity-70"
+              className={btnSecundario}
             >
               Cancelar
             </button>

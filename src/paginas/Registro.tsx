@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { ErrorApi, registrarConCorreo } from '../api/usuarios.ts'
 import { Campo } from '../componentes/Campo.tsx'
 import { ElegirAvatar } from '../componentes/ElegirAvatar.tsx'
+import { btnPrimario, textoSecundario, tituloPagina } from '../estilos.ts'
 import { ErrorConfiguracion } from '../firebase/cliente.ts'
 import { ingresarConCorreo } from '../firebase/ingresar.ts'
 import { primerCampo, validarRegistro, type DatosRegistro } from '../sesion/validar-registro.ts'
@@ -123,14 +124,14 @@ export function Registro() {
 
   return (
     <>
-      <h1 className="text-3xl font-semibold">Registro</h1>
-      <p className="mt-3 max-w-prose">Crea tu cuenta con correo y contraseña.</p>
+      <h1 className={tituloPagina}>Registro</h1>
+      <p className={textoSecundario}>Crea tu cuenta con correo y contraseña.</p>
       {fase === 'exito' ? (
         <p className="mt-6 text-exito" role="status">
           {mensaje}
         </p>
       ) : (
-        <form className="mt-6 max-w-prose" aria-busy={fase === 'cargando'} noValidate onSubmit={enviar}>
+        <form className="mt-8 max-w-[520px]" aria-busy={fase === 'cargando'} noValidate onSubmit={enviar}>
           <div aria-live="polite">
             {mensaje && <p className={fase === 'error' ? 'text-aviso' : undefined}>{mensaje}</p>}
           </div>
@@ -162,12 +163,6 @@ export function Registro() {
             deshabilitado={ocupado}
             onChange={(valor) => cambiar('nombreUsuario', valor)}
           />
-          <ElegirAvatar
-            valor={datos.avatar}
-            error={errores.avatar}
-            deshabilitado={ocupado}
-            onChange={(valor) => cambiar('avatar', valor)}
-          />
           <Campo
             id="correo"
             etiqueta="Correo"
@@ -189,6 +184,12 @@ export function Registro() {
             deshabilitado={ocupado}
             onChange={(valor) => cambiar('contrasena', valor)}
           />
+          <ElegirAvatar
+            valor={datos.avatar}
+            error={errores.avatar}
+            deshabilitado={ocupado}
+            onChange={(valor) => cambiar('avatar', valor)}
+          />
           {ofrecerIngreso && (
             <p className="mt-4">
               <Link to="/ingreso" className="text-pino underline">
@@ -199,16 +200,15 @@ export function Registro() {
           <button
             type="submit"
             disabled={ocupado}
-            className="mt-6 rounded-md bg-pino px-4 py-2 font-medium text-white hover:bg-pino-hover disabled:opacity-70"
+            className={`${btnPrimario} mt-6 w-full`}
           >
             {fase === 'cargando' ? 'Creando tu cuenta.' : 'Crear cuenta'}
           </button>
-          <p className="mt-4 text-piedra">
+          <p className="mt-4 text-[15px]">
             Si ya tienes cuenta, entra en{' '}
-            <Link to="/ingreso" className="text-pino underline">
+            <Link to="/ingreso" className="font-semibold text-pino underline">
               Ingreso
             </Link>
-            .
           </p>
         </form>
       )}

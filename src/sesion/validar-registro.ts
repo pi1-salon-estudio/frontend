@@ -44,6 +44,28 @@ export function validarRegistro(datos: DatosRegistro): Record<string, string> {
   return campos
 }
 
+export function validarCambioPerfil(datos: {
+  nombres: string
+  apellidos: string
+  avatar: string
+}): Record<string, string> {
+  const campos: Record<string, string> = {}
+  const nombres = datos.nombres.trim()
+  const apellidos = datos.apellidos.trim()
+  const avatar = datos.avatar.trim()
+
+  if (!nombres) campos.nombres = 'Escribe tus nombres.'
+  else if (nombres.length > 80) campos.nombres = 'Los nombres no pueden pasar de 80 caracteres.'
+
+  if (!apellidos) campos.apellidos = 'Escribe tus apellidos.'
+  else if (apellidos.length > 80) campos.apellidos = 'Los apellidos no pueden pasar de 80 caracteres.'
+
+  if (!avatar) campos.avatar = 'Elige un avatar.'
+  else if (avatar.length > 2000) campos.avatar = 'El avatar es demasiado largo.'
+
+  return campos
+}
+
 export function validarNombreUsuario(nombreUsuario: string): string | null {
   const nombre = nombreUsuario.trim()
   if (!nombre) return 'Elige un nombre de usuario.'

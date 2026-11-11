@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Campo } from '../componentes/Campo.tsx'
+import { btnPrimario, btnSecundario, textoSecundario, tituloPagina } from '../estilos.ts'
 import { ingresarConCorreo, ingresarConGoogle } from '../firebase/ingresar.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
 import { useTitulo } from '../use-titulo.ts'
@@ -62,9 +63,9 @@ export function Ingreso() {
 
   return (
     <>
-      <h1 className="text-3xl font-semibold">Ingreso</h1>
-      <p className="mt-3 max-w-prose">Entra con tu correo o con Google.</p>
-      <form className="mt-6 max-w-prose" aria-busy={ocupado} noValidate onSubmit={conCorreo}>
+      <h1 className={tituloPagina}>Ingreso</h1>
+      <p className={textoSecundario}>Entra con tu correo o con Google.</p>
+      <form className="mt-8 max-w-[520px]" aria-busy={ocupado} noValidate onSubmit={conCorreo}>
         <div aria-live="polite">
           {ocupado && <p>Abriendo tu sesión.</p>}
           {fase === 'error' && <p className="text-aviso">{mensaje}</p>}
@@ -91,25 +92,24 @@ export function Ingreso() {
         <button
           type="submit"
           disabled={ocupado}
-          className="mt-6 rounded-md bg-pino px-4 py-2 font-medium text-white hover:bg-pino-hover disabled:opacity-70"
+          className={`${btnPrimario} mt-6 w-full`}
         >
           {fase === 'cargando' ? 'Entrando.' : 'Entrar'}
         </button>
+        <button
+          type="button"
+          onClick={() => void conGoogle()}
+          disabled={ocupado}
+          className={`${btnSecundario} mt-3 w-full`}
+        >
+          Continuar con Google
+        </button>
       </form>
-      <button
-        type="button"
-        onClick={() => void conGoogle()}
-        disabled={ocupado}
-        className="mt-3 rounded-md border border-linea bg-white px-4 py-2 font-medium text-tinta hover:underline disabled:opacity-70"
-      >
-        Continuar con Google
-      </button>
-      <p className="mt-4 text-piedra">
-        Si todavía no tienes cuenta, créala en{' '}
-        <Link to="/registro" className="text-pino underline">
-          Registro
+      <p className="mt-5 text-[15px]">
+        ¿No tienes cuenta?{' '}
+        <Link to="/registro" className="font-semibold text-pino underline">
+          Crear cuenta
         </Link>
-        .
       </p>
     </>
   )

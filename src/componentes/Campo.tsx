@@ -27,7 +27,7 @@ export function Campo({
 
   return (
     <div className="mt-4">
-      <label htmlFor={id} className="block font-medium">
+      <label htmlFor={id} className="block text-sm font-semibold">
         {etiqueta}
       </label>
       {ayuda && (
@@ -46,7 +46,7 @@ export function Campo({
         aria-invalid={error ? true : undefined}
         aria-describedby={descrito}
         onChange={(evento) => onChange(evento.target.value)}
-        className={`mt-1 w-full rounded-md border bg-papel px-3 py-2 text-tinta ${error ? 'border-2 border-aviso' : 'border-linea'}`}
+        className={`mt-1.5 h-11 w-full rounded-lg border bg-papel px-3 text-base text-tinta ${error ? 'border-2 border-aviso' : 'border-linea'}`}
       />
       {error && (
         <p id={errorId} className="mt-1 text-sm text-aviso">
