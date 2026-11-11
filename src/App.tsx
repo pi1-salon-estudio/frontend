@@ -64,7 +64,7 @@ export default function App() {
                   parrafos={[
                     'Puedes moverte con el teclado. Tab avanza, Mayús+Tab retrocede y Entrar activa el enlace o el botón que tiene el foco.',
                     'Al inicio de cada página está el enlace «Saltar al contenido».',
-                    'Puedes crear tu cuenta en Registro o continuar con Google. Si entras con Google, eliges un nombre de usuario antes del panel. El ingreso con correo todavía no está disponible.',
+                    'Puedes crear tu cuenta en Registro y entrar en Ingreso, con correo o con Google. Panel, perfil y sala piden una sesión. Si entras con Google por primera vez, eliges un nombre de usuario antes de continuar.',
                   ]}
                 />
               }
