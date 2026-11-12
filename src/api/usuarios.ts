@@ -44,6 +44,14 @@ export async function registrarConCorreo(datos: RegistroCorreo): Promise<void> {
   await pedir('/api/v1/usuarios', { method: 'POST', cuerpo: datos })
 }
 
+export async function completarConGoogle(token: string, nombreUsuario: string): Promise<void> {
+  await pedir('/api/v1/usuarios/google', {
+    method: 'POST',
+    token,
+    cuerpo: { nombreUsuario },
+  })
+}
+
 export async function obtenerSesion(token: string): Promise<EstadoSesion> {
   const cuerpo = await pedir('/api/v1/sesion', { token })
   if (!esEstado(cuerpo)) {

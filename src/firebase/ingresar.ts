@@ -1,5 +1,5 @@
-import { signInWithEmailAndPassword } from 'firebase/auth'
-import { obtenerAuth } from './cliente.ts'
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth'
+import { firebaseConfigurado, obtenerAuth } from './cliente.ts'
 
 const CREDENCIAL_INVALIDA = new Set([
   'auth/invalid-credential',
@@ -16,6 +16,26 @@ export class ErrorIngreso extends Error {
     this.name = 'ErrorIngreso'
     this.codigo = codigo
   }
+}
+
+export async function ingresarConGoogle(): Promise<void> {
+  const proveedor = new GoogleAuthProvider()
+  try {
+    await signInWithPopup(obtenerAuth(), proveedor)
+  } catch (error) {
+    throw new ErrorIngreso(mensajeDeIngreso(error), codigoDe(error))
+  }
+}
+
+export async function cerrarAuth(): Promise<void> {
+  if (!firebaseConfigurado()) return
+  await signOut(obtenerAuth())
+}
+
+export async function tokenActual(): Promise<string> {
+  const usuario = firebaseConfigurado() ? obtenerAuth().currentUser : null
+  if (!usuario) throw new ErrorIngreso('Inicia sesión para continuar.', 'auth/no-sesion')
+  return usuario.getIdToken()
 }
 
 export async function ingresarConCorreo(correo: string, contrasena: string): Promise<void> {

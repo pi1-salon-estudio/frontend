@@ -9,7 +9,7 @@ export type EstadoVista =
 
 export type ContextoSesion = {
   estado: EstadoVista
-  reintentar: () => void
+  reintentar: () => Promise<void>
 }
 
 export const ContextoSesionReact = createContext<ContextoSesion | null>(null)
