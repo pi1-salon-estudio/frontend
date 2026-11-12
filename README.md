@@ -21,6 +21,9 @@ React 19, TypeScript, Vite 8, Tailwind CSS 4 y ESLint con `eslint-plugin-jsx-a11
 | Variable | Para qué sirve | En local | En Vercel |
 |---|---|---|---|
 | `VITE_API_URL` | URL base de la API, sin `/` al final | `http://localhost:3000` o la URL de Render | `https://pi1-salon-estudio-api.onrender.com` (Production y Preview) |
+| `VITE_FIREBASE_API_KEY` | Configuración pública de Firebase Authentication | La de la consola de Firebase | La misma, en Production y Preview |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Dominio de autenticación del proyecto | La de la consola de Firebase | La misma, en Production y Preview |
+| `VITE_FIREBASE_PROJECT_ID` | Identificador del proyecto de Firebase | La de la consola de Firebase | La misma, en Production y Preview |
 
 Todo lo que empieza por `VITE_` queda escrito dentro del JavaScript que descarga el navegador, así que cualquiera lo puede leer. Aquí nunca van llaves, contraseñas ni tokens. Si algo tiene que ser secreto, vive en el backend.
 
@@ -32,7 +35,7 @@ El inicio pide `GET /api/v1/base-tecnica` a la URL de `VITE_API_URL` y muestra e
 
 La primera consulta a Render puede tardar cerca de un minuto porque el servicio gratuito se duerme. A los 10 segundos la pantalla avisa que el servidor puede estar despertando. Si pasan 90 segundos sin respuesta, queda el error y se puede reintentar.
 
-También están las rutas del mapa: inicio, ingreso, registro, panel, perfil, sala, ayuda y la página de no encontrado. Ingreso, registro, panel, perfil y sala dicen con claridad que llegan en un sprint posterior.
+También están las rutas del mapa: inicio, ingreso, registro, panel, perfil, sala, ayuda y la página de no encontrado. Registro crea la cuenta con correo y, si la sesión abre, lleva al panel. El panel vacío dice que todavía no hay salas. Ingreso, perfil y sala siguen anunciando que llegan después. Para crear la cuenta hacen falta las variables de Firebase y los proveedores de correo activados en la consola.
 
 ## Ejecutar en local
 
