@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { cerrarSesion } from '../api/usuarios.ts'
-import { btnPrimario, btnSecundario, textoSecundario, tituloPagina } from '../estilos.ts'
+import { btnPrimario, btnSecundario, tarjeta, textoSecundario, tituloPagina } from '../estilos.ts'
 import { cerrarAuth, tokenActual } from '../firebase/ingresar.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
 import { useTitulo } from '../use-titulo.ts'
@@ -25,7 +25,7 @@ export function Panel() {
       // La sesión local se cierra igual. El servidor puede tardar unos segundos en revocar el token.
     }
     await cerrarAuth()
-    navigate('/ingreso', { replace: true })
+    navigate('/ingreso', { replace: true, state: { sesionCerrada: true } })
   }
 
   return (
@@ -76,13 +76,20 @@ export function Panel() {
             <p className={cuentaCreada ? 'mt-3 text-piedra' : textoSecundario}>
               Hola, {perfil.nombres}. Tu nombre de usuario es {perfil.nombreUsuario}.
             </p>
-            <section className="mt-8">
-              <h2 className="text-2xl font-semibold">Tus salas</h2>
-              <div className="mt-4 rounded-lg border border-linea px-8 py-16">
-                <p className="text-xl">Todavía no tienes salas.</p>
-                <button type="button" disabled className={`${btnSecundario} mt-6 cursor-not-allowed opacity-60`}>
-                  Crear una sala
-                </button>
+            <section className="mt-8" aria-labelledby="titulo-salas">
+              <h2 id="titulo-salas" className="text-xl leading-7 font-semibold">
+                Tus salas
+              </h2>
+              {/* Estado vacío del prototipo. Crear salas es US-06 (S2): no se muestra un botón que no hace nada. */}
+              <div className={`${tarjeta} mt-4 flex flex-col items-center text-center`}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="text-pino">
+                  <rect x="3" y="4" width="18" height="12" rx="2" stroke="currentColor" strokeWidth="1.75" />
+                  <path d="M8 20h8M12 16v4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+                </svg>
+                <p className="mt-3 text-lg leading-[26px] font-semibold">Todavía no tienes salas</p>
+                <p className="mt-2 text-[15px] leading-[22px] text-piedra">
+                  Aquí aparecerán las salas que crees y a las que te unas. Pronto podrás crearlas desde esta página.
+                </p>
               </div>
             </section>
           </>

@@ -1,3 +1,4 @@
+import { textoSecundario, tituloPagina } from '../estilos.ts'
 import { useTitulo } from '../use-titulo.ts'
 
 type PaginaSimpleProps = {
@@ -10,9 +11,9 @@ export function PaginaSimple({ titulo, parrafos }: PaginaSimpleProps) {
 
   return (
     <>
-      <h1 className="text-3xl font-semibold">{titulo}</h1>
+      <h1 className={tituloPagina}>{titulo}</h1>
       {parrafos.map((parrafo) => (
-        <p key={parrafo} className="mt-3 max-w-prose">
+        <p key={parrafo} className={textoSecundario}>
           {parrafo}
         </p>
       ))}

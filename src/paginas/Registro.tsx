@@ -2,10 +2,12 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ErrorApi, registrarConCorreo } from '../api/usuarios.ts'
 import { Campo } from '../componentes/Campo.tsx'
+import { BotonGoogle, SeparadorO } from '../componentes/BotonGoogle.tsx'
 import { ElegirAvatar } from '../componentes/ElegirAvatar.tsx'
-import { btnPrimario, textoSecundario, tituloPagina } from '../estilos.ts'
+import { btnPrimario, tarjeta, textoSecundario, tituloPagina } from '../estilos.ts'
 import { ErrorConfiguracion } from '../firebase/cliente.ts'
-import { ingresarConCorreo } from '../firebase/ingresar.ts'
+import { ingresarConCorreo, ingresarConGoogle } from '../firebase/ingresar.ts'
+import { useSesion } from '../sesion/use-sesion.ts'
 import { primerCampo, validarRegistro, type DatosRegistro } from '../sesion/validar-registro.ts'
 import { useTitulo } from '../use-titulo.ts'
 
@@ -29,6 +31,14 @@ export function Registro() {
   const [mensaje, setMensaje] = useState('')
   const [ofrecerIngreso, setOfrecerIngreso] = useState(false)
   const [foco, setFoco] = useState<{ id: string; marca: number } | null>(null)
+  const [viaGoogle, setViaGoogle] = useState(false)
+  const { estado } = useSesion()
+
+  // Solo después de elegir Google: el registro con correo tiene su propio paso de éxito.
+  useEffect(() => {
+    if (!viaGoogle || estado.tipo !== 'lista') return
+    navigate(estado.perfilCompleto ? '/panel' : '/registro/usuario', { replace: true })
+  }, [viaGoogle, estado, navigate])
 
   useEffect(() => {
     if (!foco) return
@@ -120,18 +130,36 @@ export function Registro() {
     setFase('exito')
   }
 
+  async function conGoogle() {
+    if (fase === 'cargando' || fase === 'exito') return
+    setErrores({})
+    setMensaje('')
+    setOfrecerIngreso(false)
+    setFase('cargando')
+    try {
+      await ingresarConGoogle()
+      setViaGoogle(true)
+      setFase('vacio')
+    } catch (error) {
+      setMensaje(error instanceof Error ? error.message : 'No pudimos continuar con Google. Inténtalo de nuevo.')
+      setFase('error')
+    }
+  }
+
   const ocupado = fase === 'cargando' || fase === 'exito'
 
   return (
     <>
       <h1 className={tituloPagina}>Registro</h1>
-      <p className={textoSecundario}>Crea tu cuenta con correo y contraseña.</p>
+      <p className={textoSecundario}>
+        Crea tu cuenta para estudiar en salas con chat, video y pantalla compartida.
+      </p>
       {fase === 'exito' ? (
         <p className="mt-6 text-exito" role="status">
           {mensaje}
         </p>
       ) : (
-        <form className="mt-8 max-w-[520px]" aria-busy={fase === 'cargando'} noValidate onSubmit={enviar}>
+        <form className={`${tarjeta} mt-6`} aria-busy={fase === 'cargando'} noValidate onSubmit={enviar}>
           <div aria-live="polite">
             {mensaje && <p className={fase === 'error' ? 'text-aviso' : undefined}>{mensaje}</p>}
           </div>
@@ -202,12 +230,14 @@ export function Registro() {
             disabled={ocupado}
             className={`${btnPrimario} mt-6 w-full`}
           >
-            {fase === 'cargando' ? 'Creando tu cuenta.' : 'Crear cuenta'}
+            {fase === 'cargando' ? 'Creando tu cuenta…' : 'Crear cuenta'}
           </button>
-          <p className="mt-4 text-[15px]">
-            Si ya tienes cuenta, entra en{' '}
-            <Link to="/ingreso" className="font-semibold text-pino underline">
-              Ingreso
+          <SeparadorO />
+          <BotonGoogle onClick={() => void conGoogle()} deshabilitado={ocupado} />
+          <p className="mt-5 text-center text-sm text-piedra">
+            ¿Ya tienes cuenta?{' '}
+            <Link to="/ingreso" className="font-semibold text-tinta underline">
+              Ingresa
             </Link>
           </p>
         </form>
