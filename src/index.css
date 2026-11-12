@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  /* Paleta de la guía visual del S0 (contrastes medidos el 4-nov-2026). */
-  --color-tinta: #1c1917;
-  --color-papel: #f7f4ef;
+  --color-tinta: #0a0a0a;
+  --color-papel: #ffffff;
   --color-blanco: #ffffff;
-  --color-pino: #143d38;
-  --color-pino-hover: #0e2e2a;
-  --color-linea: #d6d3d1;
-  --color-aviso: #9f1239;
-  --color-exito: #14532d;
-  --color-piedra: #44403c;
-  /* Únicos colores fuera de la guía: los exige la norma de marca del botón de Google. */
+  --color-pino: #1d4ed8;
+  --color-pino-hover: #1e3a8a;
+  --color-cielo: #3b82f6;
+  --color-activo: #eff6ff;
+  --color-linea: #e5e5e5;
+  --color-aviso: #1e3a8a;
+  --color-exito: #1d4ed8;
+  --color-piedra: #262626;
   --color-google-borde: #747775;
   --color-google-texto: #1f1f1f;
   --font-sans: "Segoe UI", sans-serif;
