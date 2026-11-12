@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { textoSecundario, tituloPagina } from '../estilos.ts'
 import { useTitulo } from '../use-titulo.ts'
 
 export function NoEncontrada() {
@@ -6,12 +7,9 @@ export function NoEncontrada() {
 
   return (
     <>
-      <h1 className="text-3xl font-semibold">No encontramos esta página</h1>
-      <p className="mt-3 max-w-prose">La dirección no corresponde a ninguna pantalla del salón.</p>
-      <Link
-        to="/"
-        className="mt-6 inline-block rounded-md bg-pino px-4 py-2 font-medium text-white hover:bg-pino-hover"
-      >
+      <h1 className={tituloPagina}>No encontramos esta página</h1>
+      <p className={textoSecundario}>La dirección no corresponde a ninguna página del salón.</p>
+      <Link to="/" className="mt-5 inline-block text-base font-semibold text-pino underline">
         Volver al inicio
       </Link>
     </>

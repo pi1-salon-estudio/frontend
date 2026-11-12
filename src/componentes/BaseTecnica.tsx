@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { btnPrimario } from '../estilos.ts'
 import {
   consultarBaseTecnica,
   ErrorConsulta,
@@ -128,7 +129,7 @@ export function BaseTecnica() {
           type="button"
           onClick={reintentar}
           aria-describedby="mensaje-base"
-          className="mt-4 rounded-md bg-pino px-4 py-2 font-medium text-white hover:bg-pino-hover"
+          className={`${btnPrimario} mt-4`}
         >
           Reintentar
         </button>

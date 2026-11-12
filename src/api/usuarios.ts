@@ -44,12 +44,23 @@ export async function registrarConCorreo(datos: RegistroCorreo): Promise<void> {
   await pedir('/api/v1/usuarios', { method: 'POST', cuerpo: datos })
 }
 
+export async function cerrarSesion(token: string): Promise<void> {
+  await pedir('/api/v1/sesion/cerrar', { method: 'POST', token })
+}
+
 export async function completarConGoogle(token: string, nombreUsuario: string): Promise<void> {
   await pedir('/api/v1/usuarios/google', {
     method: 'POST',
     token,
     cuerpo: { nombreUsuario },
   })
+}
+
+export async function guardarPerfil(
+  token: string,
+  datos: { nombres: string; apellidos: string; avatar: string },
+): Promise<void> {
+  await pedir('/api/v1/perfil', { method: 'PATCH', token, cuerpo: datos })
 }
 
 export async function obtenerSesion(token: string): Promise<EstadoSesion> {
@@ -62,7 +73,7 @@ export async function obtenerSesion(token: string): Promise<EstadoSesion> {
 
 async function pedir(
   ruta: string,
-  opciones: { method?: 'GET' | 'POST'; token?: string; cuerpo?: unknown } = {},
+  opciones: { method?: 'GET' | 'POST' | 'PATCH'; token?: string; cuerpo?: unknown } = {},
 ): Promise<unknown> {
   const base = import.meta.env.VITE_API_URL
   if (!base) {
