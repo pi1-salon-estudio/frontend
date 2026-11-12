@@ -58,7 +58,7 @@ export function mensajeDeIngreso(error: unknown): string {
   const codigo = codigoDe(error)
   if (CREDENCIAL_INVALIDA.has(codigo)) return 'Correo o contraseña incorrectos'
   if (codigo === 'auth/popup-closed-by-user' || codigo === 'auth/cancelled-popup-request') {
-    return 'Cerraste la ventana de Google. Puedes intentarlo de nuevo.'
+    return 'No terminaste el ingreso con Google. Puedes intentarlo otra vez o entrar con tu correo.'
   }
   if (codigo === 'auth/popup-blocked') {
     return 'El navegador bloqueó la ventana de Google. Permite ventanas emergentes e inténtalo de nuevo.'

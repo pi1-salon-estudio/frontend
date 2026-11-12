@@ -20,12 +20,13 @@ export function ElegirAvatar({ valor, onChange, error, deshabilitado = false }: 
         {AVATARES.map((avatar) => {
           const elegido = valor === avatar.id
           return (
-            <label key={avatar.id} className="flex flex-col items-center gap-1.5 text-xs text-piedra">
+            <label key={avatar.id} className="flex cursor-pointer flex-col items-center gap-1.5 text-xs text-piedra">
               <input
                 id={`avatar-${avatar.id}`}
                 type="radio"
                 name="avatar"
                 value={avatar.id}
+                aria-label={avatar.nombre}
                 checked={elegido}
                 disabled={deshabilitado}
                 onChange={() => onChange(avatar.id)}
