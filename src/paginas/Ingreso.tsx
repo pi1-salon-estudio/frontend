@@ -107,14 +107,14 @@ export function Ingreso() {
           onChange={setContrasena}
         />
         <button type="submit" disabled={ocupado} className={`${btnPrimario} mt-6 w-full`}>
-          {fase === 'cargando' ? 'Entrando.' : 'Entrar'}
+          {fase === 'cargando' ? 'Ingresando…' : 'Ingresar'}
         </button>
         <SeparadorO />
         <BotonGoogle onClick={() => void conGoogle()} deshabilitado={ocupado} />
         <p className="mt-5 text-center text-sm text-piedra">
           ¿No tienes cuenta?{' '}
-          <Link to="/registro" className="font-semibold text-pino underline">
-            Crear cuenta
+          <Link to="/registro" className="font-semibold text-tinta underline">
+            Regístrate
           </Link>
         </p>
       </form>

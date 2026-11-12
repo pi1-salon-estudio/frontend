@@ -152,7 +152,7 @@ export function Registro() {
     <>
       <h1 className={tituloPagina}>Registro</h1>
       <p className={textoSecundario}>
-        Crea tu cuenta con correo y contraseña.
+        Crea tu cuenta para estudiar en salas con chat, video y pantalla compartida.
       </p>
       {fase === 'exito' ? (
         <p className="mt-6 text-exito" role="status">
@@ -235,9 +235,9 @@ export function Registro() {
           <SeparadorO />
           <BotonGoogle onClick={() => void conGoogle()} deshabilitado={ocupado} />
           <p className="mt-5 text-center text-sm text-piedra">
-            Si ya tienes cuenta, entra en{' '}
-            <Link to="/ingreso" className="font-semibold text-pino underline">
-              Ingreso
+            ¿Ya tienes cuenta?{' '}
+            <Link to="/ingreso" className="font-semibold text-tinta underline">
+              Ingresa
             </Link>
           </p>
         </form>

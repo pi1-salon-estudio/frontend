@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { ENLACES } from '../navegacion.ts'
+import { ENLACES_PRIVADOS, ENLACES_PUBLICOS } from '../navegacion.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
 
 type MarcoProps = {
@@ -12,6 +12,8 @@ export function Marco({ children }: MarcoProps) {
   const { estado } = useSesion()
   const primera = useRef(true)
   const perfil = estado.tipo === 'lista' ? estado.perfil : null
+  const conSesion = estado.tipo === 'lista' && estado.perfilCompleto
+  const enlaces = conSesion ? ENLACES_PRIVADOS : ENLACES_PUBLICOS
 
   useEffect(() => {
     if (primera.current) {
@@ -34,7 +36,7 @@ export function Marco({ children }: MarcoProps) {
         <p className="mt-2 text-[13px] text-piedra">Tu grupo. Tu sala.</p>
         <nav className="mt-7" aria-label="Principal">
           <ul className="flex flex-col gap-1">
-            {ENLACES.map((enlace) => (
+            {enlaces.map((enlace) => (
               <li key={enlace.to}>
                 <NavLink
                   to={enlace.to}
