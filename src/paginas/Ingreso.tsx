@@ -27,6 +27,8 @@ export function Ingreso() {
   const [mensaje, setMensaje] = useState('')
   const [correo, setCorreo] = useState('')
   const [contrasena, setContrasena] = useState('')
+  const [errores, setErrores] = useState<{ correo?: string; contrasena?: string }>({})
+  const [foco, setFoco] = useState<{ id: string; marca: number } | null>(null)
   const destino = destinoPedido(location.state)
 
   useEffect(() => {
@@ -34,10 +36,27 @@ export function Ingreso() {
     navigate(estado.perfilCompleto ? destino : '/registro/usuario', { replace: true })
   }, [destino, estado, navigate])
 
+  // El foco se mueve después de que el formulario vuelve a estar habilitado.
+  useEffect(() => {
+    if (!foco) return
+    document.getElementById(foco.id)?.focus()
+  }, [foco])
+
   async function conCorreo(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault()
     if (fase === 'cargando') return
     setMensaje('')
+    // Se valida antes de llamar a Firebase: con campos vacíos no se dice «incorrectos».
+    const nuevos: { correo?: string; contrasena?: string } = {}
+    if (!correo.trim()) nuevos.correo = 'Escribe tu correo.'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.trim())) nuevos.correo = 'Escribe un correo válido, por ejemplo nombre@correo.com.'
+    if (!contrasena) nuevos.contrasena = 'Escribe tu contraseña.'
+    setErrores(nuevos)
+    if (nuevos.correo || nuevos.contrasena) {
+      setFase('vacio')
+      setFoco({ id: nuevos.correo ? 'correo' : 'contrasena', marca: Date.now() })
+      return
+    }
     setFase('cargando')
     try {
       await ingresarConCorreo(correo.trim().toLowerCase(), contrasena)
@@ -46,6 +65,7 @@ export function Ingreso() {
       setMensaje(error instanceof Error ? error.message : 'Correo o contraseña incorrectos')
       setContrasena('')
       setFase('error')
+      setFoco({ id: 'contrasena', marca: Date.now() })
     }
   }
 
@@ -94,6 +114,7 @@ export function Ingreso() {
           type="email"
           autoComplete="email"
           valor={correo}
+          error={errores.correo}
           deshabilitado={ocupado}
           onChange={setCorreo}
         />
@@ -103,6 +124,7 @@ export function Ingreso() {
           type="password"
           autoComplete="current-password"
           valor={contrasena}
+          error={errores.contrasena}
           deshabilitado={ocupado}
           onChange={setContrasena}
         />

@@ -20,3 +20,6 @@ export const ENLACES_PRIVADOS: readonly EnlaceNav[] = [
   { to: '/sala', etiqueta: 'Sala' },
   { to: '/ayuda', etiqueta: 'Ayuda' },
 ]
+
+// Paso obligatorio de elegir nombre de usuario: solo la ayuda, sin rutas que no sirven en ese momento.
+export const ENLACES_PASO_USUARIO: readonly EnlaceNav[] = [{ to: '/ayuda', etiqueta: 'Ayuda' }]

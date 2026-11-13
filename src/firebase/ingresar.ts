@@ -70,7 +70,7 @@ export function mensajeDeIngreso(error: unknown): string {
     return 'No pudimos conectar con el servicio de ingreso. Revisa tu conexión e inténtalo de nuevo.'
   }
   if (codigo === 'auth/operation-not-allowed') {
-    return 'El ingreso con correo no está habilitado. Hay que activarlo en Firebase.'
+    return 'El ingreso con correo no está disponible en este momento. Intenta con Google o vuelve más tarde.'
   }
   return 'No pudimos iniciar la sesión. Inténtalo de nuevo.'
 }

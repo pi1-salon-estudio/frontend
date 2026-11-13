@@ -9,8 +9,12 @@
   --color-cielo: #3b82f6;
   --color-activo: #eff6ff;
   --color-linea: #e5e5e5;
-  --color-aviso: #1e3a8a;
-  --color-exito: #1d4ed8;
+  /* Rojo solo para errores (6,5:1 sobre blanco). Antes era azul y se confundía con los enlaces. */
+  --color-aviso: #b91c1c;
+  /* Éxito distinto del color principal (5,0:1 sobre blanco). */
+  --color-exito: #15803d;
+  /* Borde de campos: WCAG 1.4.11 pide 3:1 (4,7:1 sobre blanco). linea queda para separadores. */
+  --color-borde-campo: #737373;
   --color-piedra: #262626;
   --color-google-borde: #747775;
   --color-google-texto: #1f1f1f;

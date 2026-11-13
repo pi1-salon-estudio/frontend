@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { completarConGoogle, ErrorApi } from '../api/usuarios.ts'
 import { Campo } from '../componentes/Campo.tsx'
-import { btnPrimario, btnSecundario, textoSecundario, tituloPagina } from '../estilos.ts'
+import { btnPrimario, btnSecundario, tarjeta, textoSecundario, tituloPagina } from '../estilos.ts'
 import { cerrarAuth, tokenActual } from '../firebase/ingresar.ts'
 import { validarNombreUsuario } from '../sesion/validar-registro.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
@@ -11,7 +11,7 @@ import { useTitulo } from '../use-titulo.ts'
 type Fase = 'vacio' | 'cargando' | 'error' | 'exito'
 
 export function ElegirUsuario() {
-  useTitulo('Nombre de usuario')
+  useTitulo('Elige tu nombre de usuario')
   const navigate = useNavigate()
   const { estado, reintentar } = useSesion()
   const [nombre, setNombre] = useState('')
@@ -133,14 +133,19 @@ export function ElegirUsuario() {
 
   return (
     <>
-      <h1 className={tituloPagina}>Nombre de usuario</h1>
-      <p className={textoSecundario}>Elige cómo te verán en la sala.</p>
+      <h1 className={tituloPagina}>Elige tu nombre de usuario</h1>
+      <p className={textoSecundario}>Es obligatorio para continuar. Es el nombre que verán los demás en las salas.</p>
+      {estado.tipo === 'lista' && estado.correo && (
+        <p className="mt-2 text-sm text-piedra">
+          Entraste como <span className="font-semibold text-tinta">{estado.correo}</span>
+        </p>
+      )}
       {fase === 'exito' ? (
         <p className="mt-6 text-exito" role="status">
           {mensaje}
         </p>
       ) : (
-        <form className="mt-8 max-w-[520px]" aria-busy={fase === 'cargando'} noValidate onSubmit={enviar}>
+        <form className={`${tarjeta} mt-6`} aria-busy={fase === 'cargando'} noValidate onSubmit={enviar}>
           <div aria-live="polite">
             {mensaje && <p className={fase === 'error' ? 'text-aviso' : undefined}>{mensaje}</p>}
           </div>
@@ -163,7 +168,7 @@ export function ElegirUsuario() {
               disabled={ocupado}
               className={btnPrimario}
             >
-              {fase === 'cargando' ? 'Guardando el nombre.' : 'Continuar'}
+              {fase === 'cargando' ? 'Guardando…' : 'Continuar'}
             </button>
             <button
               type="button"
