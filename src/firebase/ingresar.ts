@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth'
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithRedirect, signOut } from 'firebase/auth'
 import { firebaseConfigurado, obtenerAuth } from './cliente.ts'
 
 const CREDENCIAL_INVALIDA = new Set([
@@ -20,8 +20,10 @@ export class ErrorIngreso extends Error {
 
 export async function ingresarConGoogle(): Promise<void> {
   const proveedor = new GoogleAuthProvider()
+  proveedor.setCustomParameters({ prompt: 'select_account' })
   try {
-    await signInWithPopup(obtenerAuth(), proveedor)
+    // La ventana emergente se abría y, tras aceptar la cuenta, el navegador la bloqueaba.
+    await signInWithRedirect(obtenerAuth(), proveedor)
   } catch (error) {
     throw new ErrorIngreso(mensajeDeIngreso(error), codigoDe(error))
   }
@@ -57,7 +59,11 @@ export async function ingresarConCorreo(correo: string, contrasena: string): Pro
 export function mensajeDeIngreso(error: unknown): string {
   const codigo = codigoDe(error)
   if (CREDENCIAL_INVALIDA.has(codigo)) return 'Correo o contraseña incorrectos'
-  if (codigo === 'auth/popup-closed-by-user' || codigo === 'auth/cancelled-popup-request') {
+  if (
+    codigo === 'auth/popup-closed-by-user' ||
+    codigo === 'auth/cancelled-popup-request' ||
+    codigo === 'auth/redirect-cancelled-by-user'
+  ) {
     return 'No terminaste el ingreso con Google. Puedes intentarlo otra vez o entrar con tu correo.'
   }
   if (codigo === 'auth/popup-blocked') {

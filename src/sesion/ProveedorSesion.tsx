@@ -1,13 +1,17 @@
-import { onAuthStateChanged, type User } from 'firebase/auth'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { getRedirectResult, onAuthStateChanged, type User } from 'firebase/auth'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { obtenerSesion } from '../api/usuarios.ts'
 import { firebaseConfigurado, obtenerAuth } from '../firebase/cliente.ts'
+import { mensajeDeIngreso } from '../firebase/ingresar.ts'
 import { ContextoSesionReact, type EstadoVista } from './contexto.ts'
 
 export function ProveedorSesion({ children }: { children: ReactNode }) {
   const [estado, setEstado] = useState<EstadoVista>(() =>
     firebaseConfigurado() ? { tipo: 'cargando' } : { tipo: 'sin-sesion' },
   )
+  const [avisoGoogle, setAvisoGoogle] = useState<string | null>(null)
+  const [llegoDeGoogle, setLlegoDeGoogle] = useState(false)
+  const limpiarAvisoGoogle = useCallback(() => setAvisoGoogle(null), [])
   const usuarioRef = useRef<User | null>(null)
   const cargarRef = useRef<(usuario: User | null) => Promise<void>>(async () => {})
 
@@ -51,6 +55,15 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
       }
     }
 
+    void getRedirectResult(obtenerAuth()).then(
+      (resultado) => {
+        if (vigente && resultado) setLlegoDeGoogle(true)
+      },
+      (error: unknown) => {
+        if (vigente) setAvisoGoogle(mensajeDeIngreso(error))
+      },
+    )
+
     const cancelar = onAuthStateChanged(obtenerAuth(), (usuario) => {
       void cargar(usuario)
     })
@@ -65,5 +78,9 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
     return cargarRef.current(usuarioRef.current)
   }
 
-  return <ContextoSesionReact value={{ estado, reintentar }}>{children}</ContextoSesionReact>
+  return (
+    <ContextoSesionReact value={{ estado, reintentar, avisoGoogle, limpiarAvisoGoogle, llegoDeGoogle }}>
+      {children}
+    </ContextoSesionReact>
+  )
 }

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
+import { hayCierreVoluntario } from './cierre-voluntario.ts'
 import { useSesion } from './use-sesion.ts'
 
 export function RutaConPerfil({ children }: { children: ReactNode }) {
@@ -29,7 +30,13 @@ export function RutaConPerfil({ children }: { children: ReactNode }) {
   }
 
   if (estado.tipo === 'sin-sesion') {
-    return <Navigate to="/ingreso" replace state={{ desde: location.pathname }} />
+    return (
+      <Navigate
+        to="/ingreso"
+        replace
+        state={hayCierreVoluntario() ? { sesionCerrada: true } : { desde: location.pathname }}
+      />
+    )
   }
 
   if (!estado.perfilCompleto) {

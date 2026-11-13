@@ -5,6 +5,7 @@ import { BotonGoogle, SeparadorO } from '../componentes/BotonGoogle.tsx'
 import { Campo } from '../componentes/Campo.tsx'
 import { btnPrimario, tarjeta, textoSecundario, tituloPagina } from '../estilos.ts'
 import { ingresarConCorreo, ingresarConGoogle } from '../firebase/ingresar.ts'
+import { desmarcarCierreVoluntario } from '../sesion/cierre-voluntario.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
 import { useTitulo } from '../use-titulo.ts'
 
@@ -22,7 +23,7 @@ export function Ingreso() {
   useTitulo('Ingreso')
   const navigate = useNavigate()
   const location = useLocation()
-  const { estado } = useSesion()
+  const { estado, avisoGoogle, limpiarAvisoGoogle } = useSesion()
   const [fase, setFase] = useState<Fase>('vacio')
   const [mensaje, setMensaje] = useState('')
   const [correo, setCorreo] = useState('')
@@ -33,8 +34,15 @@ export function Ingreso() {
 
   useEffect(() => {
     if (estado.tipo !== 'lista') return
+    // El cierre deja la sesión un instante: no devolver al panel ni pisar el aviso.
+    if (esMarca(location.state, 'sesionCerrada')) return
     navigate(estado.perfilCompleto ? destino : '/registro/usuario', { replace: true })
-  }, [destino, estado, navigate])
+  }, [destino, estado, location.state, navigate])
+
+  useEffect(() => {
+    if (!esMarca(location.state, 'sesionCerrada')) return
+    desmarcarCierreVoluntario()
+  }, [location.state])
 
   // El foco se mueve después de que el formulario vuelve a estar habilitado.
   useEffect(() => {
@@ -46,6 +54,7 @@ export function Ingreso() {
     evento.preventDefault()
     if (fase === 'cargando') return
     setMensaje('')
+    limpiarAvisoGoogle()
     // Se valida antes de llamar a Firebase: con campos vacíos no se dice «incorrectos».
     const nuevos: { correo?: string; contrasena?: string } = {}
     if (!correo.trim()) nuevos.correo = 'Escribe tu correo.'
@@ -63,7 +72,6 @@ export function Ingreso() {
       setFase('vacio')
     } catch (error) {
       setMensaje(error instanceof Error ? error.message : 'Correo o contraseña incorrectos')
-      setContrasena('')
       setFase('error')
       setFoco({ id: 'contrasena', marca: Date.now() })
     }
@@ -72,6 +80,7 @@ export function Ingreso() {
   async function conGoogle() {
     if (fase === 'cargando') return
     setMensaje('')
+    limpiarAvisoGoogle()
     setFase('cargando')
     try {
       await ingresarConGoogle()
@@ -85,24 +94,26 @@ export function Ingreso() {
   const ocupado = fase === 'cargando' || estado.tipo === 'cargando'
   const sesionCerrada = esMarca(location.state, 'sesionCerrada')
   const vieneDePrivada = destinoExplicito(location.state)
+  const mensajeVisible = avisoGoogle ?? mensaje
+  const errorVisible = Boolean(avisoGoogle) || fase === 'error'
 
   return (
     <>
       <h1 className={tituloPagina}>Ingreso</h1>
       <p className={textoSecundario}>Entra con tu correo o con Google.</p>
       <div aria-live="polite">
-        {fase === 'error' && (
-          <Aviso tipo={esErrorDeGoogle(mensaje) ? 'informacion' : 'error'} titulo={mensaje} />
+        {errorVisible && (
+          <Aviso tipo={esErrorDeGoogle(mensajeVisible) ? 'informacion' : 'error'} titulo={mensajeVisible} />
         )}
         {estado.tipo === 'error' && <Aviso tipo="error" titulo={estado.mensaje} />}
-        {fase !== 'error' && vieneDePrivada && (
-          <Aviso tipo="informacion" titulo="Inicia sesión para continuar">
-            Al entrar te llevamos a la página que querías ver.
-          </Aviso>
-        )}
-        {fase !== 'error' && sesionCerrada && (
+        {fase !== 'error' && !avisoGoogle && sesionCerrada && (
           <Aviso tipo="exito" titulo="Cerraste sesión">
             Para volver, escribe tu correo y contraseña o usa Google.
+          </Aviso>
+        )}
+        {fase !== 'error' && !avisoGoogle && !sesionCerrada && vieneDePrivada && (
+          <Aviso tipo="informacion" titulo="Inicia sesión para continuar">
+            Al entrar te llevamos a la página que querías ver.
           </Aviso>
         )}
         {ocupado && <p className="sr-only">Abriendo tu sesión.</p>}
