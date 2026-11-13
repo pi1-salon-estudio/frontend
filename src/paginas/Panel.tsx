@@ -39,7 +39,7 @@ export function Panel() {
             disabled={cerrando}
             className={btnSecundario}
           >
-            {cerrando ? 'Cerrando la sesión.' : 'Cerrar sesión'}
+            {cerrando ? 'Cerrando sesión…' : 'Cerrar sesión'}
           </button>
         )}
       </div>

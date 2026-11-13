@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { ENLACES_PRIVADOS, ENLACES_PUBLICOS } from '../navegacion.ts'
+import { ENLACES_PASO_USUARIO, ENLACES_PRIVADOS, ENLACES_PUBLICOS } from '../navegacion.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
 
 type MarcoProps = {
@@ -13,7 +13,10 @@ export function Marco({ children }: MarcoProps) {
   const primera = useRef(true)
   const perfil = estado.tipo === 'lista' ? estado.perfil : null
   const conSesion = estado.tipo === 'lista' && estado.perfilCompleto
-  const enlaces = conSesion ? ENLACES_PRIVADOS : ENLACES_PUBLICOS
+  // Con sesión pero sin nombre de usuario (Google, primer ingreso) no se ofrecen Ingreso ni Registro:
+  // la persona ya entró y su única salida es terminar o cancelar el paso.
+  const sinNombreUsuario = estado.tipo === 'lista' && !estado.perfilCompleto
+  const enlaces = conSesion ? ENLACES_PRIVADOS : sinNombreUsuario ? ENLACES_PASO_USUARIO : ENLACES_PUBLICOS
 
   useEffect(() => {
     if (primera.current) {

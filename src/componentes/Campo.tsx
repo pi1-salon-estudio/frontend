@@ -51,7 +51,7 @@ export function Campo({
           aria-invalid={error ? true : undefined}
           aria-describedby={descrito}
           onChange={(evento) => onChange(evento.target.value)}
-          className={`h-11 w-full rounded-md bg-blanco px-3.5 text-[15px] text-tinta disabled:bg-papel disabled:text-piedra ${esContrasena ? 'pr-24' : ''} ${error ? 'border-2 border-aviso' : 'border border-linea'}`}
+          className={`h-11 w-full rounded-md bg-blanco px-3.5 text-[15px] text-tinta disabled:bg-papel disabled:text-piedra ${esContrasena ? 'pr-24' : ''} ${error ? 'border-2 border-aviso' : 'border border-borde-campo'}`}
         />
         {esContrasena && (
           // WCAG 3.3.8: se puede pegar y ver lo escrito. El botón no envía el formulario.
