@@ -1,5 +1,19 @@
-import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithRedirect, signOut } from 'firebase/auth'
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth'
 import { firebaseConfigurado, obtenerAuth } from './cliente.ts'
+
+let llegadaGoogle = false
+
+export function marcarLlegadaGoogle(): void {
+  llegadaGoogle = true
+}
+
+export function desmarcarLlegadaGoogle(): void {
+  llegadaGoogle = false
+}
+
+export function hayLlegadaGoogle(): boolean {
+  return llegadaGoogle
+}
 
 const CREDENCIAL_INVALIDA = new Set([
   'auth/invalid-credential',
@@ -21,10 +35,13 @@ export class ErrorIngreso extends Error {
 export async function ingresarConGoogle(): Promise<void> {
   const proveedor = new GoogleAuthProvider()
   proveedor.setCustomParameters({ prompt: 'select_account' })
+  // La redirección volvía a Ingreso sin sesión. La ventana sí puede volver:
+  // la aplicación ya permite que el origen se comunique con ella.
+  marcarLlegadaGoogle()
   try {
-    // La ventana emergente se abría y, tras aceptar la cuenta, el navegador la bloqueaba.
-    await signInWithRedirect(obtenerAuth(), proveedor)
+    await signInWithPopup(obtenerAuth(), proveedor)
   } catch (error) {
+    desmarcarLlegadaGoogle()
     throw new ErrorIngreso(mensajeDeIngreso(error), codigoDe(error))
   }
 }
