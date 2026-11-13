@@ -2,7 +2,7 @@ import { getRedirectResult, onAuthStateChanged, type User } from 'firebase/auth'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { obtenerSesion } from '../api/usuarios.ts'
 import { firebaseConfigurado, obtenerAuth } from '../firebase/cliente.ts'
-import { mensajeDeIngreso } from '../firebase/ingresar.ts'
+import { desmarcarLlegadaGoogle, hayLlegadaGoogle, mensajeDeIngreso } from '../firebase/ingresar.ts'
 import { ContextoSesionReact, type EstadoVista } from './contexto.ts'
 
 export function ProveedorSesion({ children }: { children: ReactNode }) {
@@ -65,6 +65,10 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
     )
 
     const cancelar = onAuthStateChanged(obtenerAuth(), (usuario) => {
+      if (usuario && hayLlegadaGoogle()) {
+        desmarcarLlegadaGoogle()
+        setLlegoDeGoogle(true)
+      }
       void cargar(usuario)
     })
 
