@@ -31,14 +31,15 @@ export function Registro() {
   const [mensaje, setMensaje] = useState('')
   const [ofrecerIngreso, setOfrecerIngreso] = useState(false)
   const [foco, setFoco] = useState<{ id: string; marca: number } | null>(null)
-  const [viaGoogle, setViaGoogle] = useState(false)
-  const { estado } = useSesion()
+  const { estado, avisoGoogle, limpiarAvisoGoogle, llegoDeGoogle } = useSesion()
+  const mensajeVisible = avisoGoogle ?? mensaje
+  const faseVisible = avisoGoogle ? 'error' : fase
 
-  // Solo después de elegir Google: el registro con correo tiene su propio paso de éxito.
+  // Solo al volver de Google. El registro con correo tiene su propio paso de éxito.
   useEffect(() => {
-    if (!viaGoogle || estado.tipo !== 'lista') return
+    if (!llegoDeGoogle || estado.tipo !== 'lista') return
     navigate(estado.perfilCompleto ? '/panel' : '/registro/usuario', { replace: true })
-  }, [viaGoogle, estado, navigate])
+  }, [llegoDeGoogle, estado, navigate])
 
   useEffect(() => {
     if (!foco) return
@@ -135,10 +136,10 @@ export function Registro() {
     setErrores({})
     setMensaje('')
     setOfrecerIngreso(false)
+    limpiarAvisoGoogle()
     setFase('cargando')
     try {
       await ingresarConGoogle()
-      setViaGoogle(true)
       setFase('vacio')
     } catch (error) {
       setMensaje(error instanceof Error ? error.message : 'No pudimos continuar con Google. Inténtalo de nuevo.')
@@ -156,12 +157,14 @@ export function Registro() {
       </p>
       {fase === 'exito' ? (
         <p className="mt-6 text-exito" role="status">
-          {mensaje}
+          {mensajeVisible}
         </p>
       ) : (
         <form className={`${tarjeta} mt-6`} aria-busy={fase === 'cargando'} noValidate onSubmit={enviar}>
           <div aria-live="polite">
-            {mensaje && <p className={fase === 'error' ? 'text-aviso' : undefined}>{mensaje}</p>}
+            {mensajeVisible && (
+              <p className={faseVisible === 'error' ? 'text-aviso' : undefined}>{mensajeVisible}</p>
+            )}
           </div>
           <Campo
             id="nombres"

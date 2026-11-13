@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { cerrarSesion } from '../api/usuarios.ts'
 import { btnPrimario, btnSecundario, tarjeta, textoSecundario, tituloPagina } from '../estilos.ts'
 import { cerrarAuth, tokenActual } from '../firebase/ingresar.ts'
+import { desmarcarCierreVoluntario, marcarCierreVoluntario } from '../sesion/cierre-voluntario.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
 import { useTitulo } from '../use-titulo.ts'
 
@@ -18,13 +19,20 @@ export function Panel() {
   async function salir() {
     if (cerrando) return
     setCerrando(true)
+    marcarCierreVoluntario()
     try {
       const token = await tokenActual()
       await cerrarSesion(token)
     } catch {
       // La sesión local se cierra igual. El servidor puede tardar unos segundos en revocar el token.
     }
-    await cerrarAuth()
+    try {
+      await cerrarAuth()
+    } catch {
+      desmarcarCierreVoluntario()
+      setCerrando(false)
+      return
+    }
     navigate('/ingreso', { replace: true, state: { sesionCerrada: true } })
   }
 
