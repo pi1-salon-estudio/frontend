@@ -10,6 +10,7 @@ type CampoProps = {
   type?: 'text' | 'email' | 'password'
   autoComplete?: string
   deshabilitado?: boolean
+  soloLectura?: boolean
 }
 
 export function Campo({
@@ -22,6 +23,7 @@ export function Campo({
   type = 'text',
   autoComplete,
   deshabilitado = false,
+  soloLectura = false,
 }: CampoProps) {
   const [visible, setVisible] = useState(false)
   const esContrasena = type === 'password'
@@ -46,12 +48,14 @@ export function Campo({
           type={esContrasena && visible ? 'text' : type}
           value={valor}
           disabled={deshabilitado}
+          readOnly={soloLectura}
+          aria-readonly={soloLectura || undefined}
           autoComplete={autoComplete}
           spellCheck={type === 'text' && id !== 'nombreUsuario'}
           aria-invalid={error ? true : undefined}
           aria-describedby={descrito}
           onChange={(evento) => onChange(evento.target.value)}
-          className={`h-11 w-full rounded-md bg-blanco px-3.5 text-[15px] text-tinta disabled:bg-papel disabled:text-piedra ${esContrasena ? 'pr-24' : ''} ${error ? 'border-2 border-aviso' : 'border border-borde-campo'}`}
+          className={`h-11 w-full rounded-md bg-blanco px-3.5 text-[15px] text-tinta disabled:bg-papel disabled:text-piedra read-only:bg-papel read-only:text-piedra ${esContrasena ? 'pr-24' : ''} ${error ? 'border-2 border-aviso' : 'border border-borde-campo'}`}
         />
         {esContrasena && (
           // WCAG 3.3.8: se puede pegar y ver lo escrito. El botón no envía el formulario.

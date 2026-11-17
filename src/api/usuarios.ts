@@ -56,11 +56,19 @@ export async function completarConGoogle(token: string, nombreUsuario: string): 
   })
 }
 
-export async function guardarPerfil(
-  token: string,
-  datos: { nombres: string; apellidos: string; avatar: string },
-): Promise<void> {
-  await pedir('/api/v1/perfil', { method: 'PATCH', token, cuerpo: datos })
+export type CambioPerfil = {
+  nombres: string
+  apellidos: string
+  nombreUsuario: string
+  avatar: string
+  correo: string
+}
+
+export async function guardarPerfil(token: string, datos: CambioPerfil): Promise<Perfil> {
+  const cuerpo = await pedir('/api/v1/perfil', { method: 'PATCH', token, cuerpo: datos })
+  const perfil = leerPerfil(cuerpo)
+  if (!perfil) throw new ErrorApi('La respuesta del perfil no tiene la forma esperada.')
+  return perfil
 }
 
 export async function obtenerSesion(token: string): Promise<EstadoSesion> {
@@ -124,6 +132,32 @@ function leerCampos(valor: unknown): Record<string, string> | undefined {
     if (typeof texto === 'string' && texto) campos[clave] = texto
   }
   return Object.keys(campos).length > 0 ? campos : undefined
+}
+
+function leerPerfil(cuerpo: unknown): Perfil | null {
+  if (esPerfil(cuerpo)) return cuerpo
+  if (typeof cuerpo === 'object' && cuerpo !== null && 'perfil' in cuerpo && esPerfil(cuerpo.perfil)) {
+    return cuerpo.perfil
+  }
+  return null
+}
+
+function esPerfil(cuerpo: unknown): cuerpo is Perfil {
+  if (typeof cuerpo !== 'object' || cuerpo === null) return false
+  return (
+    'nombres' in cuerpo &&
+    typeof cuerpo.nombres === 'string' &&
+    'apellidos' in cuerpo &&
+    typeof cuerpo.apellidos === 'string' &&
+    'nombreUsuario' in cuerpo &&
+    typeof cuerpo.nombreUsuario === 'string' &&
+    'avatar' in cuerpo &&
+    typeof cuerpo.avatar === 'string' &&
+    'correo' in cuerpo &&
+    typeof cuerpo.correo === 'string' &&
+    'proveedor' in cuerpo &&
+    (cuerpo.proveedor === 'correo' || cuerpo.proveedor === 'google')
+  )
 }
 
 function esEstado(cuerpo: unknown): cuerpo is EstadoSesion {

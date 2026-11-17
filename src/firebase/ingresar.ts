@@ -51,10 +51,10 @@ export async function cerrarAuth(): Promise<void> {
   await signOut(obtenerAuth())
 }
 
-export async function tokenActual(): Promise<string> {
+export async function tokenActual(forzar = false): Promise<string> {
   const usuario = firebaseConfigurado() ? obtenerAuth().currentUser : null
   if (!usuario) throw new ErrorIngreso('Inicia sesión para continuar.', 'auth/no-sesion')
-  return usuario.getIdToken()
+  return usuario.getIdToken(forzar)
 }
 
 export async function ingresarConCorreo(correo: string, contrasena: string): Promise<void> {
