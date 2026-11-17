@@ -71,6 +71,10 @@ export async function guardarPerfil(token: string, datos: CambioPerfil): Promise
   return perfil
 }
 
+export async function eliminarPerfil(token: string): Promise<void> {
+  await pedir('/api/v1/perfil', { method: 'DELETE', token })
+}
+
 export async function obtenerSesion(token: string): Promise<EstadoSesion> {
   const cuerpo = await pedir('/api/v1/sesion', { token })
   if (!esEstado(cuerpo)) {
@@ -81,7 +85,7 @@ export async function obtenerSesion(token: string): Promise<EstadoSesion> {
 
 async function pedir(
   ruta: string,
-  opciones: { method?: 'GET' | 'POST' | 'PATCH'; token?: string; cuerpo?: unknown } = {},
+  opciones: { method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'; token?: string; cuerpo?: unknown } = {},
 ): Promise<unknown> {
   const base = import.meta.env.VITE_API_URL
   if (!base) {
