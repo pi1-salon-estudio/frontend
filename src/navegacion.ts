@@ -17,7 +17,6 @@ export const ENLACES_PRIVADOS: readonly EnlaceNav[] = [
   { to: '/', etiqueta: 'Inicio', end: true },
   { to: '/panel', etiqueta: 'Panel' },
   { to: '/perfil', etiqueta: 'Perfil' },
-  { to: '/sala', etiqueta: 'Sala' },
   { to: '/ayuda', etiqueta: 'Ayuda' },
 ]
 

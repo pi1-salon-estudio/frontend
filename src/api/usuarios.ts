@@ -83,7 +83,7 @@ export async function obtenerSesion(token: string): Promise<EstadoSesion> {
   return cuerpo
 }
 
-async function pedir(
+export async function pedir(
   ruta: string,
   opciones: { method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'; token?: string; cuerpo?: unknown } = {},
 ): Promise<unknown> {

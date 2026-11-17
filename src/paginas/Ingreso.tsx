@@ -9,14 +9,16 @@ import { desmarcarCierreVoluntario } from '../sesion/cierre-voluntario.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
 import { useTitulo } from '../use-titulo.ts'
 
-const RUTAS_PRIVADAS = new Set(['/panel', '/perfil', '/sala'])
+const RUTAS_PRIVADAS = new Set(['/panel', '/perfil'])
 
 type Fase = 'vacio' | 'cargando' | 'error'
 
 function destinoPedido(state: unknown): string {
   if (typeof state !== 'object' || state === null || !('desde' in state)) return '/panel'
   const desde = state.desde
-  return typeof desde === 'string' && RUTAS_PRIVADAS.has(desde) ? desde : '/panel'
+  if (typeof desde !== 'string') return '/panel'
+  if (RUTAS_PRIVADAS.has(desde) || desde.startsWith('/salas/')) return desde
+  return '/panel'
 }
 
 export function Ingreso() {

@@ -39,7 +39,7 @@ export default function App() {
               }
             />
             <Route
-              path="/sala"
+              path="/salas/:id"
               element={
                 <RutaConPerfil>
                   <Sala />
