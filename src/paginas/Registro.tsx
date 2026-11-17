@@ -209,7 +209,7 @@ export function Registro() {
             etiqueta="Contraseña"
             type="password"
             autoComplete="new-password"
-            ayuda="La contraseña debe tener al menos 8 caracteres."
+            ayuda="Mínimo 8 caracteres. Puedes pegarla o usar tu gestor de contraseñas."
             valor={datos.contrasena}
             error={errores.contrasena}
             deshabilitado={ocupado}
