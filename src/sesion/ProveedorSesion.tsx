@@ -13,13 +13,14 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
   const [llegoDeGoogle, setLlegoDeGoogle] = useState(false)
   const limpiarAvisoGoogle = useCallback(() => setAvisoGoogle(null), [])
   const usuarioRef = useRef<User | null>(null)
-  const cargarRef = useRef<(usuario: User | null) => Promise<void>>(async () => {})
+  const cargarRef = useRef<(usuario: User | null, silencioso?: boolean) => Promise<void>>(async () => {})
 
   useEffect(() => {
     let vigente = true
     let marca = 0
 
-    async function cargar(usuario: User | null) {
+    // En silencio no pasa por «cargando»: así la página abierta no se desmonta ni pierde su aviso.
+    async function cargar(usuario: User | null, silencioso = false) {
       const actual = ++marca
       usuarioRef.current = usuario
       if (!usuario) {
@@ -27,7 +28,7 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
         return
       }
 
-      if (vigente) setEstado({ tipo: 'cargando' })
+      if (vigente && !silencioso) setEstado({ tipo: 'cargando' })
       try {
         const token = await usuario.getIdToken()
         const sesion = await obtenerSesion(token)
@@ -39,7 +40,7 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
           correo: sesion.correo,
         })
       } catch {
-        if (!vigente || actual !== marca) return
+        if (!vigente || actual !== marca || silencioso) return
         setEstado({
           tipo: 'error',
           mensaje: 'No pudimos leer tu sesión. Revisa tu conexión e inténtalo de nuevo.',
@@ -82,8 +83,12 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
     return cargarRef.current(usuarioRef.current)
   }
 
+  function actualizar() {
+    return cargarRef.current(usuarioRef.current, true)
+  }
+
   return (
-    <ContextoSesionReact value={{ estado, reintentar, avisoGoogle, limpiarAvisoGoogle, llegoDeGoogle }}>
+    <ContextoSesionReact value={{ estado, reintentar, actualizar, avisoGoogle, limpiarAvisoGoogle, llegoDeGoogle }}>
       {children}
     </ContextoSesionReact>
   )

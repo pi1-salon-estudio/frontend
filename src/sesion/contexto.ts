@@ -10,6 +10,7 @@ export type EstadoVista =
 export type ContextoSesion = {
   estado: EstadoVista
   reintentar: () => Promise<void>
+  actualizar: () => Promise<void>
   avisoGoogle: string | null
   limpiarAvisoGoogle: () => void
   llegoDeGoogle: boolean

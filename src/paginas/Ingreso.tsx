@@ -28,23 +28,27 @@ export function Ingreso() {
   const { estado, avisoGoogle, limpiarAvisoGoogle } = useSesion()
   const [fase, setFase] = useState<Fase>('vacio')
   const [mensaje, setMensaje] = useState('')
-  const [correo, setCorreo] = useState('')
+  const correoCambiado = correoNuevo(location.state)
+  const [correo, setCorreo] = useState(correoCambiado)
   const [contrasena, setContrasena] = useState('')
   const [errores, setErrores] = useState<{ correo?: string; contrasena?: string }>({})
   const [foco, setFoco] = useState<{ id: string; marca: number } | null>(null)
+  const [ingresoPropio, setIngresoPropio] = useState(false)
   const destino = destinoPedido(location.state)
+  const vieneDeCierre =
+    esMarca(location.state, 'sesionCerrada') || esMarca(location.state, 'cuentaEliminada') || Boolean(correoCambiado)
 
   useEffect(() => {
     if (estado.tipo !== 'lista') return
     // El cierre deja la sesión un instante: no devolver al panel ni pisar el aviso.
-    if (esMarca(location.state, 'sesionCerrada') || esMarca(location.state, 'cuentaEliminada')) return
+    if (vieneDeCierre && !ingresoPropio) return
     navigate(estado.perfilCompleto ? destino : '/registro/usuario', { replace: true })
-  }, [destino, estado, location.state, navigate])
+  }, [destino, estado, ingresoPropio, navigate, vieneDeCierre])
 
   useEffect(() => {
-    if (!esMarca(location.state, 'sesionCerrada') && !esMarca(location.state, 'cuentaEliminada')) return
+    if (!vieneDeCierre) return
     desmarcarCierreVoluntario()
-  }, [location.state])
+  }, [vieneDeCierre])
 
   // El foco se mueve después de que el formulario vuelve a estar habilitado.
   useEffect(() => {
@@ -69,6 +73,7 @@ export function Ingreso() {
       return
     }
     setFase('cargando')
+    setIngresoPropio(true)
     try {
       await ingresarConCorreo(correo.trim().toLowerCase(), contrasena)
       setFase('vacio')
@@ -84,6 +89,7 @@ export function Ingreso() {
     setMensaje('')
     limpiarAvisoGoogle()
     setFase('cargando')
+    setIngresoPropio(true)
     try {
       await ingresarConGoogle()
       setFase('vacio')
@@ -112,6 +118,11 @@ export function Ingreso() {
         {fase !== 'error' && !avisoGoogle && cuentaEliminada && (
           <Aviso tipo="exito" titulo="Tu cuenta fue eliminada">
             Tus salas también se borraron.
+          </Aviso>
+        )}
+        {fase !== 'error' && !avisoGoogle && correoCambiado && (
+          <Aviso tipo="exito" titulo="Guardamos tu nuevo correo">
+            Por seguridad, vuelve a entrar con {correoCambiado} y tu contraseña de siempre.
           </Aviso>
         )}
         {fase !== 'error' && !avisoGoogle && !cuentaEliminada && sesionCerrada && (
@@ -165,6 +176,11 @@ export function Ingreso() {
 
 function esMarca(state: unknown, clave: string): boolean {
   return typeof state === 'object' && state !== null && clave in state && Boolean((state as Record<string, unknown>)[clave])
+}
+
+function correoNuevo(state: unknown): string {
+  if (typeof state !== 'object' || state === null || !('correoCambiado' in state)) return ''
+  return typeof state.correoCambiado === 'string' ? state.correoCambiado : ''
 }
 
 function destinoExplicito(state: unknown): boolean {
