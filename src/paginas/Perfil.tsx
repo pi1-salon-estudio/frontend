@@ -7,7 +7,7 @@ import { Dialogo } from '../componentes/Dialogo.tsx'
 import { ElegirAvatar } from '../componentes/ElegirAvatar.tsx'
 import { btnPeligro, btnPeligroLleno, btnPrimario, btnSecundario, tituloPagina } from '../estilos.ts'
 import { cerrarAuth, tokenActual } from '../firebase/ingresar.ts'
-import { marcarCuentaEliminada } from '../sesion/cierre-voluntario.ts'
+import { desmarcarCierreVoluntario, marcarCorreoCambiado, marcarCuentaEliminada } from '../sesion/cierre-voluntario.ts'
 import { primerCampo, validarCambioPerfil } from '../sesion/validar-registro.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
 import { useTitulo } from '../use-titulo.ts'
@@ -17,7 +17,7 @@ type Fase = 'vacio' | 'cargando' | 'error' | 'exito'
 export function Perfil() {
   useTitulo('Perfil')
   const navigate = useNavigate()
-  const { estado, reintentar } = useSesion()
+  const { estado, actualizar } = useSesion()
   const perfil = estado.tipo === 'lista' ? estado.perfil : null
   const [nombres, setNombres] = useState(perfil?.nombres ?? '')
   const [apellidos, setApellidos] = useState(perfil?.apellidos ?? '')
@@ -118,8 +118,18 @@ export function Perfil() {
         avatar: avatar.trim(),
         correo: correoEnviado,
       })
-      if (correoCambio) await tokenActual(true)
-      await reintentar()
+      if (correoCambio) {
+        marcarCorreoCambiado(guardado.correo)
+        try {
+          await tokenActual(true)
+        } catch {
+          navigate('/ingreso', { replace: true, state: { correoCambiado: guardado.correo } })
+          await cerrarAuth().catch(() => undefined)
+          return
+        }
+        desmarcarCierreVoluntario()
+      }
+      await actualizar()
       setNombres(guardado.nombres)
       setApellidos(guardado.apellidos)
       setNombreUsuario(guardado.nombreUsuario)

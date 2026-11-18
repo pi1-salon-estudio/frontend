@@ -17,6 +17,11 @@ export function Aviso({ tipo, titulo, children }: AvisoProps) {
         <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75" />
         {tipo === 'exito' ? (
           <path d="M8.5 12.5l2.5 2.5 4.5-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+        ) : tipo === 'error' ? (
+          <>
+            <path d="M12 7.5v5.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+            <circle cx="12" cy="16" r="1" fill="currentColor" />
+          </>
         ) : (
           <>
             <path d="M12 11v5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
