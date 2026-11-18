@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { ErrorApi, guardarPerfil } from '../api/usuarios.ts'
+import { useNavigate } from 'react-router-dom'
+import { ErrorApi, eliminarPerfil, guardarPerfil } from '../api/usuarios.ts'
 import { AVATARES } from '../componentes/avatares.ts'
 import { Campo } from '../componentes/Campo.tsx'
+import { Dialogo } from '../componentes/Dialogo.tsx'
 import { ElegirAvatar } from '../componentes/ElegirAvatar.tsx'
-import { btnPrimario, btnSecundario, tituloPagina } from '../estilos.ts'
-import { tokenActual } from '../firebase/ingresar.ts'
+import { btnPeligro, btnPeligroLleno, btnPrimario, btnSecundario, tituloPagina } from '../estilos.ts'
+import { cerrarAuth, tokenActual } from '../firebase/ingresar.ts'
+import { marcarCuentaEliminada } from '../sesion/cierre-voluntario.ts'
 import { primerCampo, validarCambioPerfil } from '../sesion/validar-registro.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
 import { useTitulo } from '../use-titulo.ts'
@@ -13,6 +16,7 @@ type Fase = 'vacio' | 'cargando' | 'error' | 'exito'
 
 export function Perfil() {
   useTitulo('Perfil')
+  const navigate = useNavigate()
   const { estado, reintentar } = useSesion()
   const perfil = estado.tipo === 'lista' ? estado.perfil : null
   const [nombres, setNombres] = useState(perfil?.nombres ?? '')
@@ -24,6 +28,9 @@ export function Perfil() {
   const [fase, setFase] = useState<Fase>('vacio')
   const [mensaje, setMensaje] = useState('')
   const [foco, setFoco] = useState<{ id: string; marca: number } | null>(null)
+  const [confirmar, setConfirmar] = useState(false)
+  const [eliminando, setEliminando] = useState(false)
+  const [errorEliminar, setErrorEliminar] = useState('')
   const aviso = useRef<number | null>(null)
   const figura = AVATARES.find((item) => item.id === avatar) ?? AVATARES[0]
   const correoEditable = perfil?.proveedor !== 'google'
@@ -134,6 +141,35 @@ export function Perfil() {
     anunciar('Perfil guardado.')
   }
 
+  function cerrarConfirmacion() {
+    if (eliminando) return
+    setConfirmar(false)
+    setErrorEliminar('')
+  }
+
+  async function eliminar() {
+    if (eliminando) return
+    setEliminando(true)
+    setErrorEliminar('')
+    try {
+      const token = await tokenActual()
+      await eliminarPerfil(token)
+    } catch (error) {
+      setEliminando(false)
+      setErrorEliminar(
+        error instanceof Error ? error.message : 'No pudimos eliminar la cuenta. Inténtalo de nuevo.',
+      )
+      return
+    }
+    marcarCuentaEliminada()
+    navigate('/ingreso', { replace: true, state: { cuentaEliminada: true } })
+    try {
+      await cerrarAuth()
+    } catch {
+      // La cuenta ya no existe. Ingreso muestra el aviso aunque el cierre local tarde.
+    }
+  }
+
   if (!perfil) {
     return (
       <>
@@ -231,6 +267,41 @@ export function Perfil() {
           </button>
         </div>
       </form>
+      <section className="mt-10 max-w-[520px] border-t border-linea pt-6" aria-labelledby="titulo-eliminar">
+        <h2 id="titulo-eliminar" className="text-xl leading-7 font-semibold">
+          Eliminar cuenta
+        </h2>
+        <p className="mt-2 text-[15px] leading-6 text-piedra">
+          Si la eliminas, también se borran las salas que creaste.
+        </p>
+        <button
+          type="button"
+          disabled={ocupado || eliminando}
+          onClick={() => setConfirmar(true)}
+          className={`${btnPeligro} mt-4`}
+        >
+          Eliminar cuenta
+        </button>
+      </section>
+      <Dialogo abierto={confirmar} tituloId="titulo-confirmar" descritoId="texto-confirmar" onCerrar={cerrarConfirmacion}>
+        <h2 id="titulo-confirmar" className="text-xl leading-7 font-semibold">
+          ¿Eliminar tu cuenta?
+        </h2>
+        <p id="texto-confirmar" className="mt-3 text-[15px] leading-6 text-piedra">
+          Se borrarán tu cuenta y las salas que creaste, con sus mensajes. Esta acción no se puede deshacer.
+        </p>
+        <div aria-live="polite">
+          {errorEliminar && <p className="mt-3 text-sm text-aviso">{errorEliminar}</p>}
+        </div>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button type="button" disabled={eliminando} onClick={cerrarConfirmacion} className={btnSecundario}>
+            Cancelar
+          </button>
+          <button type="button" disabled={eliminando} onClick={() => void eliminar()} className={btnPeligroLleno}>
+            {eliminando ? 'Eliminando…' : errorEliminar ? 'Reintentar' : 'Eliminar cuenta'}
+          </button>
+        </div>
+      </Dialogo>
     </>
   )
 }

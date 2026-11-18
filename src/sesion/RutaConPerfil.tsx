@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import { hayCierreVoluntario } from './cierre-voluntario.ts'
+import { esCierreDeCuenta, hayCierreVoluntario } from './cierre-voluntario.ts'
 import { useSesion } from './use-sesion.ts'
 
 export function RutaConPerfil({ children }: { children: ReactNode }) {
@@ -34,7 +34,13 @@ export function RutaConPerfil({ children }: { children: ReactNode }) {
       <Navigate
         to="/ingreso"
         replace
-        state={hayCierreVoluntario() ? { sesionCerrada: true } : { desde: location.pathname }}
+        state={
+          esCierreDeCuenta()
+            ? { cuentaEliminada: true }
+            : hayCierreVoluntario()
+              ? { sesionCerrada: true }
+              : { desde: location.pathname }
+        }
       />
     )
   }

@@ -35,12 +35,12 @@ export function Ingreso() {
   useEffect(() => {
     if (estado.tipo !== 'lista') return
     // El cierre deja la sesión un instante: no devolver al panel ni pisar el aviso.
-    if (esMarca(location.state, 'sesionCerrada')) return
+    if (esMarca(location.state, 'sesionCerrada') || esMarca(location.state, 'cuentaEliminada')) return
     navigate(estado.perfilCompleto ? destino : '/registro/usuario', { replace: true })
   }, [destino, estado, location.state, navigate])
 
   useEffect(() => {
-    if (!esMarca(location.state, 'sesionCerrada')) return
+    if (!esMarca(location.state, 'sesionCerrada') && !esMarca(location.state, 'cuentaEliminada')) return
     desmarcarCierreVoluntario()
   }, [location.state])
 
@@ -93,6 +93,7 @@ export function Ingreso() {
 
   const ocupado = fase === 'cargando' || estado.tipo === 'cargando'
   const sesionCerrada = esMarca(location.state, 'sesionCerrada')
+  const cuentaEliminada = esMarca(location.state, 'cuentaEliminada')
   const vieneDePrivada = destinoExplicito(location.state)
   const mensajeVisible = avisoGoogle ?? mensaje
   const errorVisible = Boolean(avisoGoogle) || fase === 'error'
@@ -106,7 +107,12 @@ export function Ingreso() {
           <Aviso tipo={esErrorDeGoogle(mensajeVisible) ? 'informacion' : 'error'} titulo={mensajeVisible} />
         )}
         {estado.tipo === 'error' && <Aviso tipo="error" titulo={estado.mensaje} />}
-        {fase !== 'error' && !avisoGoogle && sesionCerrada && (
+        {fase !== 'error' && !avisoGoogle && cuentaEliminada && (
+          <Aviso tipo="exito" titulo="Tu cuenta fue eliminada">
+            Tus salas también se borraron.
+          </Aviso>
+        )}
+        {fase !== 'error' && !avisoGoogle && !cuentaEliminada && sesionCerrada && (
           <Aviso tipo="exito" titulo="Cerraste sesión">
             Para volver, escribe tu correo y contraseña o usa Google.
           </Aviso>
