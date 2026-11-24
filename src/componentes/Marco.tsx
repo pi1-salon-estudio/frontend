@@ -75,7 +75,7 @@ export function Marco({ children }: MarcoProps) {
         )}
       </aside>
       <main id="contenido" tabIndex={-1} className="min-w-0 flex-1 px-6 py-8 md:px-16 md:py-11">
-        <div className="w-full max-w-[720px]">
+        <div className={`w-full ${pathname.startsWith('/salas/') ? 'max-w-[960px]' : 'max-w-[720px]'}`}>
           <p className="text-xs font-semibold tracking-[0.08em] text-piedra">UNIVERSIDAD DEL VALLE</p>
           <div className="mt-7">{children}</div>
         </div>

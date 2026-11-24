@@ -24,6 +24,7 @@ React 19, TypeScript, Vite 8, Tailwind CSS 4 y ESLint con `eslint-plugin-jsx-a11
 | `VITE_FIREBASE_API_KEY` | Configuración pública de Firebase Authentication | La de la consola de Firebase | La misma, en Production y Preview |
 | `VITE_FIREBASE_AUTH_DOMAIN` | Dominio de autenticación del proyecto | La de la consola de Firebase | La misma, en Production y Preview |
 | `VITE_FIREBASE_PROJECT_ID` | Identificador del proyecto de Firebase | La de la consola de Firebase | La misma, en Production y Preview |
+| `VITE_REALTIME_URL` | URL del servidor de tiempo real (Socket.IO), sin `/` al final | `http://localhost:4000` o la URL de Render | `https://pi1-salon-estudio-realtime.onrender.com` (Production y Preview) |
 
 Todo lo que empieza por `VITE_` queda escrito dentro del JavaScript que descarga el navegador, así que cualquiera lo puede leer. Aquí nunca van llaves, contraseñas ni tokens. Si algo tiene que ser secreto, vive en el backend.
 

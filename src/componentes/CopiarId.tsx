@@ -3,9 +3,10 @@ import { btnSecundario } from '../estilos.ts'
 
 type CopiarIdProps = {
   valor: string
+  enLinea?: boolean
 }
 
-export function CopiarId({ valor }: CopiarIdProps) {
+export function CopiarId({ valor, enLinea = false }: CopiarIdProps) {
   const [aviso, setAviso] = useState('')
   const [error, setError] = useState(false)
 
@@ -28,13 +29,15 @@ export function CopiarId({ valor }: CopiarIdProps) {
 
   return (
     <div className="mt-3">
-      <p className="break-all text-[15px]">
-        <span className="font-semibold">ID </span>
-        {valor}
-      </p>
-      <button type="button" onClick={() => void copiar()} className={`${btnSecundario} mt-3`}>
-        Copiar ID
-      </button>
+      <div className={enLinea ? 'flex flex-wrap items-center gap-3' : ''}>
+        <p className="break-all text-[15px]">
+          <span className="font-semibold">ID </span>
+          {valor}
+        </p>
+        <button type="button" onClick={() => void copiar()} className={`${btnSecundario} ${enLinea ? '' : 'mt-3'}`}>
+          Copiar ID
+        </button>
+      </div>
       <p aria-live="polite" className={error ? 'mt-2 text-sm text-aviso' : 'mt-2 text-sm text-exito'}>
         {aviso}
       </p>
