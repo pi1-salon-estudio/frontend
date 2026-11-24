@@ -34,7 +34,7 @@ export function RutaConPerfil({ children }: { children: ReactNode }) {
   }
 
   if (!estado.perfilCompleto) {
-    return <Navigate to="/registro/usuario" replace />
+    return <Navigate to="/registro/usuario" replace state={{ desde: location.pathname }} />
   }
 
   return children

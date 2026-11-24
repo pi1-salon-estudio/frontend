@@ -1,9 +1,10 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { completarConGoogle, ErrorApi } from '../api/usuarios.ts'
 import { Campo } from '../componentes/Campo.tsx'
 import { btnPrimario, btnSecundario, tarjeta, textoSecundario, tituloPagina } from '../estilos.ts'
 import { cerrarAuth, tokenActual } from '../firebase/ingresar.ts'
+import { destinoPedido } from '../sesion/destino.ts'
 import { validarNombreUsuario } from '../sesion/validar-registro.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
 import { useTitulo } from '../use-titulo.ts'
@@ -13,6 +14,8 @@ type Fase = 'vacio' | 'cargando' | 'error' | 'exito'
 export function ElegirUsuario() {
   useTitulo('Elige tu nombre de usuario')
   const navigate = useNavigate()
+  const location = useLocation()
+  const destino = destinoPedido(location.state)
   const { estado, reintentar } = useSesion()
   const [nombre, setNombre] = useState('')
   const [error, setError] = useState('')
@@ -66,9 +69,9 @@ export function ElegirUsuario() {
       return
     }
 
-    setMensaje('Nombre de usuario listo. Entrando al panel.')
+    setMensaje(destino === '/panel' ? 'Nombre de usuario listo. Entrando al panel.' : 'Nombre de usuario listo. Entrando a la sala.')
     setFase('exito')
-    navigate('/panel', { state: { cuentaCreada: true } })
+    navigate(destino, { state: { cuentaCreada: true } })
   }
 
   if (estado.tipo === 'cargando') {
