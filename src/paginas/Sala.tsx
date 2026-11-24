@@ -11,6 +11,7 @@ import { ListaMensajes } from '../componentes/sala/ListaMensajes.tsx'
 import { Participantes } from '../componentes/sala/Participantes.tsx'
 import { btnPeligro, btnPrimario, btnSecundario, tituloPagina } from '../estilos.ts'
 import { tokenActual } from '../firebase/ingresar.ts'
+import { useHistorial } from '../sala/use-historial.ts'
 import { useSalaEnVivo, type EstadoConexion } from '../sala/use-sala-en-vivo.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
 import { useTitulo } from '../use-titulo.ts'
@@ -85,6 +86,12 @@ function SalaAbierta({ sala, uid, onCambio }: SalaAbiertaProps) {
   }, [sala, navigate])
 
   const vivo = useSalaEnVivo({ salaId: sala.id, uid, onEliminada })
+  const historial = useHistorial({
+    salaId: sala.id,
+    agregar: vivo.agregar,
+    reconexiones: vivo.reconexiones,
+    masAntiguo: vivo.mensajes[0]?.id ?? null,
+  })
 
   if (vivo.conexion === 'no-existe') {
     return (
@@ -140,7 +147,12 @@ function SalaAbierta({ sala, uid, onCambio }: SalaAbiertaProps) {
           <ListaMensajes
             mensajes={vivo.mensajes}
             uid={uid}
-            estado={vivo.conexion === 'conectando' && vivo.mensajes.length === 0 ? 'cargando' : 'lista'}
+            estado={historial.fase}
+            onReintentar={historial.reintentar}
+            hayMas={historial.hayMas}
+            cargandoAnteriores={historial.cargandoAnteriores}
+            errorAnteriores={historial.errorAnteriores}
+            onCargarAnteriores={() => void historial.cargarAnteriores()}
           />
           <EscribirMensaje deshabilitado={vivo.conexion !== 'conectada'} enviar={vivo.enviar} />
         </section>

@@ -1,23 +1,40 @@
-import { useLayoutEffect, useRef, useState, type ReactNode, type UIEvent } from 'react'
+import { useLayoutEffect, useRef, useState, type UIEvent } from 'react'
+import { btnSecundario } from '../../estilos.ts'
 import { formatoHora } from '../../sala/formato-hora.ts'
 import type { Mensaje } from '../../tiempo-real/contrato.ts'
 
 type ListaMensajesProps = {
   mensajes: Mensaje[]
   uid: string
-  estado: 'cargando' | 'lista'
-  arriba?: ReactNode
+  estado: 'cargando' | 'lista' | 'error'
+  onReintentar?: () => void
+  hayMas?: boolean
+  cargandoAnteriores?: boolean
+  errorAnteriores?: string
+  onCargarAnteriores?: () => void
 }
 
 const MARGEN_FINAL = 48
 
 // La lista no es región viva (decisión 8): si lo fuera, NVDA leería todo el historial
 // cada vez que carga. Los mensajes nuevos se anuncian en una región aparte de la sala.
-export function ListaMensajes({ mensajes, uid, estado, arriba }: ListaMensajesProps) {
+export function ListaMensajes({
+  mensajes,
+  uid,
+  estado,
+  onReintentar,
+  hayMas = false,
+  cargandoAnteriores = false,
+  errorAnteriores = '',
+  onCargarAnteriores,
+}: ListaMensajesProps) {
   const caja = useRef<HTMLDivElement>(null)
   const [alFinal, setAlFinal] = useState(true)
   const [vistos, setVistos] = useState(0)
   const ultimo = mensajes.at(-1)
+  const primero = mensajes.at(0)
+  // Altura antes de cargar mensajes anteriores: sirve para que la lectura no salte.
+  const alturaPrevia = useRef<number | null>(null)
   const nuevos = alFinal ? 0 : Math.max(0, mensajes.length - vistos)
 
   function alDesplazar(evento: UIEvent<HTMLDivElement>) {
@@ -27,6 +44,11 @@ export function ListaMensajes({ mensajes, uid, estado, arriba }: ListaMensajesPr
       setAlFinal(fin)
       setVistos(mensajes.length)
     }
+  }
+
+  function anteriores() {
+    if (caja.current) alturaPrevia.current = caja.current.scrollHeight
+    onCargarAnteriores?.()
   }
 
   function bajar() {
@@ -44,6 +66,17 @@ export function ListaMensajes({ mensajes, uid, estado, arriba }: ListaMensajesPr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ultimo?.id])
 
+  // US-11: al cargar los anteriores arriba, se conserva el punto de lectura.
+  useLayoutEffect(() => {
+    const el = caja.current
+    if (!el || alturaPrevia.current === null) return
+    el.scrollTop += el.scrollHeight - alturaPrevia.current
+    alturaPrevia.current = null
+    // Si ya no quedan más, el botón desaparece: el foco pasa a la lista para no perderse.
+    if (!hayMas) el.focus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [primero?.id])
+
   return (
     <div className="relative">
       <div
@@ -59,6 +92,14 @@ export function ListaMensajes({ mensajes, uid, estado, arriba }: ListaMensajesPr
         {estado === 'cargando' && (
           <p className="flex h-full items-center justify-center text-[15px] text-piedra">Cargando mensajes…</p>
         )}
+        {estado === 'error' && (
+          <div className="flex h-full flex-col items-center justify-center text-center">
+            <p className="text-[15px] text-aviso">No pudimos cargar los mensajes de la sala.</p>
+            <button type="button" onClick={onReintentar} className={`${btnSecundario} mt-3`}>
+              Reintentar
+            </button>
+          </div>
+        )}
         {estado === 'lista' && mensajes.length === 0 && (
           <div className="flex h-full flex-col items-center justify-center text-center">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="text-pino">
@@ -70,7 +111,16 @@ export function ListaMensajes({ mensajes, uid, estado, arriba }: ListaMensajesPr
         )}
         {estado === 'lista' && mensajes.length > 0 && (
           <>
-            {arriba}
+            {hayMas && (
+              <div className="mb-3 flex flex-col items-center">
+                <button type="button" onClick={anteriores} disabled={cargandoAnteriores} className={btnSecundario}>
+                  {cargandoAnteriores ? 'Cargando mensajes anteriores…' : 'Cargar mensajes anteriores'}
+                </button>
+                <p aria-live="polite" className="mt-2 text-sm text-aviso">
+                  {errorAnteriores}
+                </p>
+              </div>
+            )}
             <ol className="flex flex-col gap-1.5">
               {mensajes.map((m) => {
                 const mio = m.autorUid === uid
