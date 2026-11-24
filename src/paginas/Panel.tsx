@@ -1,13 +1,13 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { crearSala, listarSalas, type Sala } from '../api/salas.ts'
+import { crearSala, listarSalas, obtenerSala, type Sala } from '../api/salas.ts'
 import { ErrorApi, cerrarSesion } from '../api/usuarios.ts'
 import { Campo } from '../componentes/Campo.tsx'
 import { CopiarId } from '../componentes/CopiarId.tsx'
 import { btnPrimario, btnSecundario, tarjeta, textoSecundario, tituloPagina } from '../estilos.ts'
 import { cerrarAuth, tokenActual } from '../firebase/ingresar.ts'
 import { desmarcarCierreVoluntario, marcarCierreVoluntario } from '../sesion/cierre-voluntario.ts'
-import { validarNombreSala } from '../sesion/validar-sala.ts'
+import { validarIdSala, validarNombreSala } from '../sesion/validar-sala.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
 import { useTitulo } from '../use-titulo.ts'
 
@@ -24,6 +24,12 @@ export function Panel() {
   const [errorNombre, setErrorNombre] = useState('')
   const [creando, setCreando] = useState(false)
   const [carga, setCarga] = useState(0)
+  const [idSala, setIdSala] = useState('')
+  const [errorId, setErrorId] = useState('')
+  const [buscando, setBuscando] = useState(false)
+  // Cada error de «Unirse» sube este número para mover el foco al campo, aunque el
+  // mensaje se repita. Así NVDA lee de nuevo la etiqueta y el error.
+  const [focoId, setFocoId] = useState(0)
   const cuentaCreada = location.state?.cuentaCreada === true
   const perfil = estado.tipo === 'lista' ? estado.perfil : null
   const uid = perfil?.uid ?? null
@@ -50,6 +56,44 @@ export function Panel() {
       vigente = false
     }
   }, [uid, carga])
+
+  // El foco se mueve después de que el campo vuelve a estar habilitado: un campo
+  // deshabilitado no puede recibirlo.
+  useEffect(() => {
+    if (focoId === 0) return
+    document.getElementById('idSala')?.focus()
+  }, [focoId])
+
+  async function unirse(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault()
+    if (buscando) return
+    const limpio = idSala.trim()
+    setIdSala(limpio)
+    const error = validarIdSala(limpio)
+    if (error) {
+      setErrorId(error)
+      setFocoId((actual) => actual + 1)
+      return
+    }
+    setErrorId('')
+    setBuscando(true)
+    try {
+      const token = await tokenActual()
+      const sala = await obtenerSala(token, limpio)
+      navigate(`/salas/${sala.id}`)
+    } catch (fallo) {
+      const noExiste = fallo instanceof ErrorApi && fallo.codigo === 'SALA_NO_ENCONTRADA'
+      setErrorId(
+        noExiste
+          ? 'No encontramos una sala con ese ID. Revisa que esté completo o pídelo de nuevo.'
+          : fallo instanceof Error
+            ? fallo.message
+            : 'No pudimos buscar la sala. Inténtalo de nuevo.',
+      )
+      setBuscando(false)
+      setFocoId((actual) => actual + 1)
+    }
+  }
 
   async function salir() {
     if (cerrando) return
@@ -140,7 +184,32 @@ export function Panel() {
             <p className={cuentaCreada ? 'mt-3 text-piedra' : textoSecundario}>
               Hola, {perfil.nombres}. Tu nombre de usuario es {perfil.nombreUsuario}.
             </p>
-            <section className="mt-8" aria-labelledby="titulo-salas">
+            <section className="mt-8" aria-labelledby="titulo-unirse">
+              <h2 id="titulo-unirse" className="text-xl leading-7 font-semibold">
+                Unirse a una sala
+              </h2>
+              <p className="mt-1 text-[15px] leading-[22px] text-piedra">
+                Entra a la sala de tu grupo con el ID que te compartieron.
+              </p>
+              <form className="max-w-[520px]" noValidate onSubmit={(evento) => void unirse(evento)}>
+                <Campo
+                  id="idSala"
+                  etiqueta="ID de la sala"
+                  ayuda="Puedes pegarlo. Los espacios al inicio y al final no cuentan."
+                  valor={idSala}
+                  error={errorId}
+                  deshabilitado={buscando}
+                  onChange={(valor) => {
+                    setIdSala(valor)
+                    setErrorId('')
+                  }}
+                />
+                <button type="submit" disabled={buscando} className={`${btnSecundario} mt-4`}>
+                  {buscando ? 'Buscando…' : 'Unirme'}
+                </button>
+              </form>
+            </section>
+            <section className="mt-10" aria-labelledby="titulo-salas">
               <h2 id="titulo-salas" className="text-xl leading-7 font-semibold">
                 Tus salas
               </h2>

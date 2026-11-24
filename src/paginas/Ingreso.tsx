@@ -6,20 +6,11 @@ import { Campo } from '../componentes/Campo.tsx'
 import { btnPrimario, tarjeta, textoSecundario, tituloPagina } from '../estilos.ts'
 import { ingresarConCorreo, ingresarConGoogle } from '../firebase/ingresar.ts'
 import { desmarcarCierreVoluntario } from '../sesion/cierre-voluntario.ts'
+import { destinoPedido } from '../sesion/destino.ts'
 import { useSesion } from '../sesion/use-sesion.ts'
 import { useTitulo } from '../use-titulo.ts'
 
-const RUTAS_PRIVADAS = new Set(['/panel', '/perfil'])
-
 type Fase = 'vacio' | 'cargando' | 'error'
-
-function destinoPedido(state: unknown): string {
-  if (typeof state !== 'object' || state === null || !('desde' in state)) return '/panel'
-  const desde = state.desde
-  if (typeof desde !== 'string') return '/panel'
-  if (RUTAS_PRIVADAS.has(desde) || desde.startsWith('/salas/')) return desde
-  return '/panel'
-}
 
 export function Ingreso() {
   useTitulo('Ingreso')
@@ -42,7 +33,9 @@ export function Ingreso() {
     if (estado.tipo !== 'lista') return
     // El cierre deja la sesión un instante: no devolver al panel ni pisar el aviso.
     if (vieneDeCierre && !ingresoPropio) return
-    navigate(estado.perfilCompleto ? destino : '/registro/usuario', { replace: true })
+    // Una cuenta nueva de Google pasa por el nombre de usuario: se lleva el destino para volver a la sala.
+    if (estado.perfilCompleto) navigate(destino, { replace: true })
+    else navigate('/registro/usuario', { replace: true, state: { desde: destino } })
   }, [destino, estado, ingresoPropio, navigate, vieneDeCierre])
 
   useEffect(() => {
