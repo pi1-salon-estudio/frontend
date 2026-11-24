@@ -3,7 +3,9 @@ import { Link, useParams } from 'react-router-dom'
 import { ErrorApi } from '../api/usuarios.ts'
 import { obtenerSala, type Sala } from '../api/salas.ts'
 import { CopiarId } from '../componentes/CopiarId.tsx'
-import { btnPrimario, tituloPagina } from '../estilos.ts'
+import { EditarSala } from '../componentes/sala/EditarSala.tsx'
+import { EliminarSala } from '../componentes/sala/EliminarSala.tsx'
+import { btnPeligro, btnPrimario, btnSecundario, tituloPagina } from '../estilos.ts'
 import { tokenActual } from '../firebase/ingresar.ts'
 import { useTitulo } from '../use-titulo.ts'
 
@@ -11,6 +13,8 @@ export function Sala() {
   const { id = '' } = useParams()
   const [sala, setSala] = useState<Sala | null>(null)
   const [mensaje, setMensaje] = useState('')
+  const [dialogo, setDialogo] = useState<'editar' | 'eliminar' | null>(null)
+  const [guardado, setGuardado] = useState('')
   const fase = mensaje ? 'error' : sala?.id === id ? 'lista' : 'cargando'
   useTitulo(fase === 'lista' && sala ? sala.nombre : 'Sala')
 
@@ -60,8 +64,19 @@ export function Sala() {
             <p className="mt-3 text-base text-piedra">
               {sala.esAnfitrion ? 'Eres el anfitrión de esta sala.' : 'Entraste a esta sala.'}
             </p>
+            {guardado && <p className="mt-1 text-[15px] font-semibold text-exito">{guardado}</p>}
             <CopiarId valor={sala.id} />
             <p className="mt-4 text-[15px] text-piedra">Comparte el ID con tu grupo.</p>
+            {sala.esAnfitrion && (
+              <div className="mt-4 flex flex-wrap gap-3">
+                <button type="button" onClick={() => setDialogo('editar')} className={btnSecundario}>
+                  Editar nombre
+                </button>
+                <button type="button" onClick={() => setDialogo('eliminar')} className={btnPeligro}>
+                  Eliminar sala
+                </button>
+              </div>
+            )}
             <p className="mt-6">
               <Link to="/panel" className="font-semibold text-pino underline">
                 Volver al panel
@@ -70,6 +85,22 @@ export function Sala() {
           </>
         )}
       </div>
+      {sala?.esAnfitrion && (
+        <>
+          <EditarSala
+            key={`editar-${sala.nombre}`}
+            sala={sala}
+            abierto={dialogo === 'editar'}
+            onCerrar={() => setDialogo(null)}
+            onGuardada={(nueva) => {
+              setSala(nueva)
+              setGuardado('Nombre guardado.')
+              setDialogo(null)
+            }}
+          />
+          <EliminarSala sala={sala} abierto={dialogo === 'eliminar'} onCerrar={() => setDialogo(null)} />
+        </>
+      )}
     </>
   )
 }

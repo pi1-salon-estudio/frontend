@@ -27,6 +27,18 @@ export async function obtenerSala(token: string, id: string): Promise<Sala> {
   return sala
 }
 
+// US-07. La API responde 403 si quien llama no es el anfitrión y 404 si la sala ya no existe.
+export async function editarSala(token: string, id: string, nombre: string): Promise<Sala> {
+  const cuerpo = await pedir(`/api/v1/salas/${encodeURIComponent(id)}`, { method: 'PATCH', token, cuerpo: { nombre } })
+  const sala = leerSala(cuerpo)
+  if (!sala) throw new ErrorApi('La respuesta de la sala no tiene la forma esperada.')
+  return sala
+}
+
+export async function eliminarSala(token: string, id: string): Promise<void> {
+  await pedir(`/api/v1/salas/${encodeURIComponent(id)}`, { method: 'DELETE', token })
+}
+
 function leerSala(cuerpo: unknown): Sala | null {
   if (esSala(cuerpo)) return cuerpo
   if (typeof cuerpo === 'object' && cuerpo !== null && 'sala' in cuerpo && esSala(cuerpo.sala)) return cuerpo.sala
