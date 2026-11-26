@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { crearSala, listarSalas, obtenerSala, type Sala } from '../api/salas.ts'
 import { ErrorApi, cerrarSesion } from '../api/usuarios.ts'
+import { Aviso } from '../componentes/Aviso.tsx'
 import { Campo } from '../componentes/Campo.tsx'
 import { CopiarId } from '../componentes/CopiarId.tsx'
 import { btnPrimario, btnSecundario, tarjeta, textoSecundario, tituloPagina } from '../estilos.ts'
@@ -31,6 +32,9 @@ export function Panel() {
   // mensaje se repita. Así NVDA lee de nuevo la etiqueta y el error.
   const [focoId, setFocoId] = useState(0)
   const cuentaCreada = location.state?.cuentaCreada === true
+  // US-07: el anfitrión llega aquí después de eliminar una sala; el invitado, cuando el anfitrión la elimina.
+  const salaEliminada = typeof location.state?.salaEliminada === 'string' ? location.state.salaEliminada : ''
+  const salaCerrada = typeof location.state?.salaCerrada === 'string' ? location.state.salaCerrada : ''
   const perfil = estado.tipo === 'lista' ? estado.perfil : null
   const uid = perfil?.uid ?? null
   const faseSalas = mensajeSalas ? 'error' : cargadoPara === uid && salas ? 'lista' : 'cargando'
@@ -181,6 +185,16 @@ export function Panel() {
         {perfil && (
           <>
             {cuentaCreada && <p className="text-exito">Tu cuenta quedó creada.</p>}
+            {salaEliminada && (
+              <Aviso tipo="exito" titulo={`Eliminaste la sala «${salaEliminada}».`}>
+                También se borraron sus mensajes.
+              </Aviso>
+            )}
+            {salaCerrada && (
+              <Aviso tipo="informacion" titulo={`El anfitrión eliminó la sala «${salaCerrada}».`}>
+                Ya no puedes entrar a esa sala.
+              </Aviso>
+            )}
             <p className={cuentaCreada ? 'mt-3 text-piedra' : textoSecundario}>
               Hola, {perfil.nombres}. Tu nombre de usuario es {perfil.nombreUsuario}.
             </p>
