@@ -1,3 +1,4 @@
+import { esObjeto, leerMensajes, type Mensaje } from '../tiempo-real/contrato.ts'
 import { ErrorApi, pedir } from './usuarios.ts'
 
 export type Sala = {
@@ -37,6 +38,26 @@ export async function editarSala(token: string, id: string, nombre: string): Pro
 
 export async function eliminarSala(token: string, id: string): Promise<void> {
   await pedir(`/api/v1/salas/${encodeURIComponent(id)}`, { method: 'DELETE', token })
+}
+
+export type PaginaMensajes = {
+  mensajes: Mensaje[]
+  hayAnteriores: boolean
+}
+
+export const MENSAJES_POR_PAGINA = 50
+
+// US-11: el historial llega por partes, del más antiguo al más reciente dentro de cada página.
+// Sin «antes» trae los últimos; con «antes» (el ID del mensaje más antiguo que ya se muestra)
+// trae los anteriores a ese.
+export async function listarMensajes(token: string, salaId: string, antes?: string | null): Promise<PaginaMensajes> {
+  const params = new URLSearchParams({ limite: String(MENSAJES_POR_PAGINA) })
+  if (antes) params.set('antes', antes)
+  const cuerpo = await pedir(`/api/v1/salas/${encodeURIComponent(salaId)}/mensajes?${params}`, { token })
+  if (!esObjeto(cuerpo) || !Array.isArray(cuerpo.mensajes)) {
+    throw new ErrorApi('La respuesta del historial no tiene la forma esperada.')
+  }
+  return { mensajes: leerMensajes(cuerpo.mensajes), hayAnteriores: cuerpo.hayAnteriores === true }
 }
 
 function leerSala(cuerpo: unknown): Sala | null {
