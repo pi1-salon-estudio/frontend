@@ -11,6 +11,7 @@ type CampoProps = {
   autoComplete?: string
   deshabilitado?: boolean
   soloLectura?: boolean
+  maxLength?: number
 }
 
 export function Campo({
@@ -24,6 +25,7 @@ export function Campo({
   autoComplete,
   deshabilitado = false,
   soloLectura = false,
+  maxLength,
 }: CampoProps) {
   const [visible, setVisible] = useState(false)
   const esContrasena = type === 'password'
@@ -51,6 +53,7 @@ export function Campo({
           readOnly={soloLectura}
           aria-readonly={soloLectura || undefined}
           autoComplete={autoComplete}
+          maxLength={maxLength}
           spellCheck={type === 'text' && id !== 'nombreUsuario'}
           aria-invalid={error ? true : undefined}
           aria-describedby={descrito}

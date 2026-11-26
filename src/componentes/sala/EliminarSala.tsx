@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { eliminarSala, type Sala } from '../../api/salas.ts'
+import type { ResultadoAccion } from '../../sala/use-sala-en-vivo.ts'
 import { btnPeligroLleno, btnSecundario } from '../../estilos.ts'
 import { tokenActual } from '../../firebase/ingresar.ts'
 import { Dialogo } from '../Dialogo.tsx'
@@ -9,10 +10,13 @@ type EliminarSalaProps = {
   sala: Sala
   abierto: boolean
   onCerrar: () => void
+  // Con conexión en vivo se elimina por sala:eliminar, que avisa a los conectados antes de borrar.
+  // Devuelve null si no hay conexión, y entonces se usa DELETE de la API.
+  eliminarEnVivo?: () => Promise<ResultadoAccion | null>
 }
 
 // Mismo patrón que «Eliminar cuenta» en Perfil: lo que funciona igual se ve igual.
-export function EliminarSala({ sala, abierto, onCerrar }: EliminarSalaProps) {
+export function EliminarSala({ sala, abierto, onCerrar, eliminarEnVivo }: EliminarSalaProps) {
   const navigate = useNavigate()
   const [eliminando, setEliminando] = useState(false)
   const [error, setError] = useState('')
@@ -28,8 +32,16 @@ export function EliminarSala({ sala, abierto, onCerrar }: EliminarSalaProps) {
     setEliminando(true)
     setError('')
     try {
-      const token = await tokenActual()
-      await eliminarSala(token, sala.id)
+      const enVivo = eliminarEnVivo ? await eliminarEnVivo() : null
+      if (enVivo && !enVivo.ok) {
+        setEliminando(false)
+        setError(enVivo.mensaje)
+        return
+      }
+      if (!enVivo) {
+        const token = await tokenActual()
+        await eliminarSala(token, sala.id)
+      }
     } catch (fallo) {
       setEliminando(false)
       setError(fallo instanceof Error ? fallo.message : 'No pudimos eliminar la sala. Inténtalo de nuevo.')
